@@ -54,6 +54,11 @@
       conf: { high: "высокая", medium: "средняя", low: "низкая" },
       expNone: "Экспериментов пока нет.", expCurrent: "Текущий эксперимент", expDone: "Завершённые эксперименты",
       expStart: "Начать эксперимент", expPlanned: "Запланирован", expActive: "Идёт", expFinished: "Завершён",
+      pageAi: "Сделать страницу с помощью ИИ", pageAiWait: "ИИ пишет текст страницы…", pageSimple: "Простая страница без ИИ",
+      pageDraftHint: "Проверь и поправь текст. ИИ не должен выдумывать факты: убери всё, что не соответствует правде. Ссылки, почта и телефоны запрещены.",
+      pageF: { headline: "Заголовок", sub: "Подзаголовок", benefits: "Что это даст (3 пункта)", steps: "Как это будет работать (3 шага)", faq: "Вопросы и ответы", q: "Вопрос", a: "Ответ", theme: "Оформление" },
+      pageThemes: { sun: "Солнце (жёлтый)", sky: "Небо (синий)", night: "Ночь (тёмный)", paper: "Бумага (графит)" },
+      pageRegen: "Сгенерировать заново", pageShares: "Поделились",
       pageTitle: "Страница-проверка спроса",
       pageIntro: "Сайт опубликует мини-страницу твоей идеи и сам посчитает уникальных посетителей и нажатия «Мне это нужно» и «Заплатил бы за это». Оплаты и сбора контактов нет: это только отметки интереса.",
       pageConsent: "Я согласен, что название, суть, аудитория и проблема из моей идеи станут публичными на странице",
@@ -193,6 +198,11 @@
       conf: { high: "high", medium: "medium", low: "low" },
       expNone: "No experiments yet.", expCurrent: "Current experiment", expDone: "Completed experiments",
       expStart: "Start the experiment", expPlanned: "Planned", expActive: "In progress", expFinished: "Completed",
+      pageAi: "Make the page with AI", pageAiWait: "The AI is writing the page text…", pageSimple: "Simple page without AI",
+      pageDraftHint: "Check and edit the text. The AI must not invent facts: remove anything that is not true. Links, emails and phone numbers are not allowed.",
+      pageF: { headline: "Headline", sub: "Subheading", benefits: "What you would get (3 items)", steps: "How it would work (3 steps)", faq: "Questions and answers", q: "Question", a: "Answer", theme: "Look" },
+      pageThemes: { sun: "Sun (yellow)", sky: "Sky (blue)", night: "Night (dark)", paper: "Paper (graphite)" },
+      pageRegen: "Generate again", pageShares: "Shared",
       pageTitle: "Demand test page",
       pageIntro: "The site publishes a mini page for your idea and counts unique visitors and clicks on \"I need this\" and \"I would pay for this\". There is no payment or contact collection: these are only interest marks.",
       pageConsent: "I agree that the title, essence, audience and problem from my idea become public on the page",
@@ -335,6 +345,8 @@
     });
     x.page = x.page && typeof x.page.id === "string" && typeof x.page.token === "string" ? x.page : null;
     x.sim = x.sim && typeof x.sim === "object" ? x.sim : null;
+    x.pageDraft = x.pageDraft && typeof x.pageDraft === "object" && typeof x.pageDraft.headline === "string" ? x.pageDraft : null;
+    if (x.pageDraft) { x.pageDraft.benefits = arr(x.pageDraft.benefits); x.pageDraft.steps = arr(x.pageDraft.steps); x.pageDraft.faq = arr(x.pageDraft.faq); }
     x.history = arr(x.history);
     x.decisions = arr(x.decisions);
     return x;
@@ -779,12 +791,62 @@
     var msg = el("p", { class: "muted", role: "status" });
     if (!pr.page) {
       box.appendChild(el("p", { text: p("pageIntro") }));
+      var draft = pr.pageDraft;
+      var gen = btn(busy["pg" + pr.id] ? p("pageAiWait") : (draft ? p("pageRegen") : p("pageAi")), draft ? "ghost small" : "", async function () {
+        if (busy["pg" + pr.id]) return;
+        busy["pg" + pr.id] = true; render();
+        var out = await A.api({ mode: "landing", idea: pr.idea });
+        busy["pg" + pr.id] = false;
+        if (out.ok && out.result && out.result.headline) {
+          pr.pageDraft = { headline: out.result.headline, sub: out.result.sub || "", benefits: out.result.benefits || [], steps: out.result.steps || [], faq: out.result.faq || [], theme: (pr.pageDraft && pr.pageDraft.theme) || "sun" };
+          pr.pageError = ""; touch(pr);
+        } else { pr.pageError = (out.ok && out.result && out.result.refusal) || out.error || p("realityFailed"); }
+        render();
+      });
+      if (busy["pg" + pr.id]) gen.disabled = true;
+      if (!draft) box.appendChild(gen);
+      if (pr.pageError) box.appendChild(el("p", { class: "err", role: "alert", text: pr.pageError }));
+
+      if (draft) {
+        box.appendChild(el("p", { class: "notice", text: p("pageDraftHint") }));
+        var F = p("pageF");
+        function field(label, value, max, onchange, multi) {
+          var inp = multi ? el("textarea", { rows: "2", maxlength: String(max) }) : el("input", { type: "text", maxlength: String(max) });
+          inp.value = value || "";
+          inp.addEventListener("change", function () { onchange(inp.value.trim().slice(0, max)); touch(pr); });
+          return inputRow(label, inp);
+        }
+        box.appendChild(field(F.headline, draft.headline, 90, function (v) { draft.headline = v; }));
+        box.appendChild(field(F.sub, draft.sub, 200, function (v) { draft.sub = v; }, true));
+        box.appendChild(el("h4", { text: F.benefits }));
+        [0, 1, 2].forEach(function (i) { box.appendChild(field("", draft.benefits[i] || "", 140, function (v) { draft.benefits[i] = v; })); });
+        box.appendChild(el("h4", { text: F.steps }));
+        [0, 1, 2].forEach(function (i) { box.appendChild(field("", draft.steps[i] || "", 140, function (v) { draft.steps[i] = v; })); });
+        box.appendChild(el("h4", { text: F.faq }));
+        [0, 1].forEach(function (i) {
+          var f = draft.faq[i] || { q: "", a: "" };
+          box.appendChild(field(F.q, f.q, 120, function (v) { draft.faq[i] = { q: v, a: (draft.faq[i] && draft.faq[i].a) || "" }; }));
+          box.appendChild(field(F.a, f.a, 240, function (v) { draft.faq[i] = { q: (draft.faq[i] && draft.faq[i].q) || "", a: v }; }, true));
+        });
+        var themeSel = el("select", { "aria-label": F.theme });
+        Object.keys(p("pageThemes")).forEach(function (k) { themeSel.appendChild(el("option", { value: k, text: p("pageThemes")[k] })); });
+        themeSel.value = draft.theme || "sun";
+        themeSel.addEventListener("change", function () { draft.theme = themeSel.value; touch(pr); });
+        box.appendChild(inputRow(F.theme, themeSel));
+        box.appendChild(gen);
+      }
+
       var cb = el("input", { type: "checkbox", id: "page-consent-" + pr.id });
       box.appendChild(el("label", { for: "page-consent-" + pr.id, class: "consent" }, [cb, document.createTextNode(" " + p("pageConsent"))]));
-      var pub = btn(busy["page" + pr.id] ? p("pageWait") : p("pagePublish"), "", async function () {
+      var pub = btn(busy["page" + pr.id] ? p("pageWait") : (draft ? p("pagePublish") : p("pageSimple")), draft ? "" : "ghost", async function () {
         if (!cb.checked) { msg.textContent = p("pageNeedConsent"); return; }
         busy["page" + pr.id] = true; msg.textContent = p("pageWait"); pub.disabled = true;
-        var r = await pagePost({ action: "create", idea: pr.idea });
+        var payload = { action: "create", idea: pr.idea };
+        if (draft) {
+          payload.landing = { headline: draft.headline, sub: draft.sub, benefits: draft.benefits.filter(Boolean), steps: draft.steps.filter(Boolean), faq: draft.faq.filter(function (f) { return f && f.q && f.a; }) };
+          payload.theme = draft.theme;
+        }
+        var r = await pagePost(payload);
         busy["page" + pr.id] = false;
         if (r.ok && r.data.id) { pr.page = { id: r.data.id, token: r.data.token, created: now() }; log(pr, "page", ""); touch(pr); render(); }
         else { msg.className = "err"; msg.textContent = r.error; pub.disabled = false; }
@@ -800,7 +862,7 @@
     var stats = el("dl", { class: "meta" });
     function showStats(st) {
       stats.textContent = "";
-      [[p("pageViews"), st.views], [p("pageWants"), st.needs], [p("pagePays"), st.pays], [p("pageReports"), st.reports]].forEach(function (r) {
+      [[p("pageViews"), st.views], [p("pageWants"), st.needs], [p("pagePays"), st.pays], [p("pageShares"), st.shares || 0], [p("pageReports"), st.reports]].forEach(function (r) {
         stats.appendChild(el("div", null, [el("dt", { text: r[0] }), el("dd", { text: String(r[1]) })]));
       });
     }

@@ -53,7 +53,7 @@ test('create, view, unique counting, stats and delete with token', async () => {
   await call('POST', { action: 'event', id, type: 'pay' }, '5.5.5.5', 'a');
   assert.strictEqual((await call('POST', { action: 'stats', id, token: 'wrong' }, '6.6.6.6')).code, 403);
   const s = await call('POST', { action: 'stats', id, token }, '6.6.6.6');
-  assert.deepStrictEqual(s.body.stats, { views: 2, needs: 0, pays: 1, reports: 0 });
+  assert.deepStrictEqual(s.body.stats, { views: 2, needs: 0, pays: 1, reports: 0, shares: 0 });
   assert.strictEqual((await call('POST', { action: 'delete', id, token: 'wrong' }, '6.6.6.6')).code, 403);
   assert.strictEqual((await call('POST', { action: 'delete', id, token }, '6.6.6.6')).code, 200);
   assert.strictEqual((await call('GET', null, '7.7.7.7', 'ua', { id })).code, 404);
@@ -84,4 +84,36 @@ test('without storage the function says so', async () => {
   assert.strictEqual(r.code, 503);
   assert.strictEqual(r.body.code, 'storage');
   process.env.KV_REST_API_URL = saved;
+});
+
+test('SSR page escapes everything and shows landing sections', async () => {
+  const p = require('../api/p.js');
+  const landing = { headline: 'Заголовок <script>x</script>', sub: 'Подзаголовок', benefits: ['b1', 'b2', 'b3'], steps: ['s1', 's2', 's3'], faq: [{ q: 'Вопрос?', a: 'Ответ' }] };
+  const created = await call('POST', { action: 'create', idea: IDEA, theme: 'sky', landing }, '10.0.0.1');
+  assert.strictEqual(created.code, 200);
+  const html = await new Promise((resolve) => {
+    const res = { headers: {}, setHeader() {}, status(c) { this.code = c; return this; }, send(h) { resolve({ code: this.code, html: h }); } };
+    p({ query: { id: created.body.id }, headers: { host: 'razborai.vercel.app', 'x-forwarded-proto': 'https' } }, res);
+  });
+  assert.strictEqual(html.code, 200);
+  assert.ok(!html.html.includes('<script>x</script>'));
+  assert.ok(html.html.includes('Заголовок script x /script'));
+  assert.ok(html.html.includes('data-theme="sky"'));
+  assert.ok(html.html.includes('og:title') && html.html.includes('https://razborai.vercel.app/p/' + created.body.id));
+  assert.ok(html.html.includes('b1') && html.html.includes('s3') && html.html.includes('Вопрос?'));
+  assert.ok(html.html.includes('t.me/share/url'));
+  const missing = await new Promise((resolve) => {
+    const res = { setHeader() {}, status(c) { this.code = c; return this; }, send() { resolve(this.code); } };
+    p({ query: { id: 'zzzzzzzzzz' }, headers: {} }, res);
+  });
+  assert.strictEqual(missing, 404);
+});
+
+test('landing text with links is rejected and theme is whitelisted', async () => {
+  const bad = await call('POST', { action: 'create', idea: IDEA, landing: { headline: 'H', benefits: ['см. https://x.example'], steps: [], faq: [] } }, '10.0.0.2');
+  assert.strictEqual(bad.code, 400);
+  const ok = await call('POST', { action: 'create', idea: IDEA, theme: 'evil' }, '10.0.0.3');
+  assert.strictEqual(ok.code, 200);
+  const g = await call('GET', null, '10.0.0.4', 'ua', { id: ok.body.id });
+  assert.strictEqual(g.body.page.theme, 'sun');
 });
