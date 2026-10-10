@@ -1,0 +1,58 @@
+'use strict';
+const test = require('node:test');
+const assert = require('node:assert');
+process.env.YANDEX_API_KEY = 'k';
+process.env.YANDEX_FOLDER_ID = 'f';
+process.env.RATE_PER_MINUTE = '3';
+const handler = require('../api/agent.js');
+
+function call(body, ip) {
+  return new Promise((resolve) => {
+    const res = { headers: {}, setHeader(k, v) { this.headers[k] = v; }, status(c) { this.code = c; return this; }, json(o) { resolve({ code: this.code, body: o, headers: this.headers }); } };
+    handler({ method: 'POST', body, headers: { 'x-forwarded-for': ip }, socket: {} }, res);
+  });
+}
+
+const GOODREALITY = {
+  assumptions: [{ text: 'a1', importance: 'high' }, { text: 'a2', importance: 'weird' }],
+  unknowns: ['u'],
+  risks: [{ title: 'r1', why_critical: 'w', if_wrong: 'i', confidence: 'HIGH', cheapest_test: 't' }, { title: 'r2', why_critical: 'w', if_wrong: 'i', confidence: 'x', cheapest_test: 't' }],
+  primary_index: 9,
+  experiment: { title: 'e', hypothesis: 'h', why_now: 'n', steps: ['s1', 's2'], budget: '0', duration: '48h', tools: ['t'], success_metric: 'm', fail_criterion: 'f', ambiguous: 'a', next_if_success: 'x', next_if_fail: 'y', next_if_ambiguous: 'z' },
+  score: 99
+};
+
+test('normalizeReality clamps enums and primary index, drops model numbers', () => {
+  const r = handler.normalizeReality(GOODREALITY);
+  assert.strictEqual(r.assumptions[1].importance, 'medium');
+  assert.strictEqual(r.risks[0].confidence, 'high');
+  assert.strictEqual(r.risks[1].confidence, 'low');
+  assert.strictEqual(r.primary_index, 0);
+  assert.strictEqual(r.score, undefined);
+});
+
+test('normalizeReality rejects empty experiment', () => {
+  assert.strictEqual(handler.normalizeReality({ assumptions: [], risks: [] }), null);
+});
+
+test('per-minute limit returns 429 with Retry-After', async () => {
+  const origFetch = global.fetch;
+  global.fetch = async () => ({ ok: true, text: async () => JSON.stringify({ choices: [{ message: { content: JSON.stringify(GOODREALITY) } }] }) });
+  try {
+    const body = { mode: 'reality', lang: 'en', idea: { title: 'Reminders for tutors', pitch: 'SMS reminders for lessons and payments' } };
+    const codes = [];
+    let last;
+    for (let i = 0; i < 4; i++) { last = await call(body, '1.2.3.4'); codes.push(last.code); }
+    assert.deepStrictEqual(codes, [200, 200, 200, 429]);
+    assert.ok(Number(last.headers['Retry-After']) >= 1);
+    const other = await call(body, '5.6.7.8');
+    assert.strictEqual(other.code, 200);
+    assert.ok(other.body.result.experiment.steps.length >= 2);
+  } finally { global.fetch = origFetch; }
+});
+
+test('reality validates input and mode', async () => {
+  assert.strictEqual((await call({ mode: 'reality', idea: {} }, '9.9.9.9')).code, 400);
+  assert.strictEqual((await call({ mode: 'hack' }, '9.9.9.9')).code, 400);
+  assert.strictEqual((await call({ mode: 'analyze', text: 'x'.repeat(2000) }, '9.9.9.9')).code, 400);
+});
