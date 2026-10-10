@@ -205,6 +205,7 @@ const REALITY_RULES_RU = [
   '7. success_metric и fail_criterion содержат конкретные числа (например, «из 10 собеседников минимум 3 просят ссылку или предоплату»). ambiguous объясняет, какие результаты не дают ответа и что с ними делать. Просмотры и лайки не считаются доказательством готовности платить.',
   '8. Не предлагай обман, незаконные или опасные действия, спам и рассылку незнакомым людям без согласия.',
   '9. Если запрос не про бизнес-идею, оставь поля пустыми, а в refusal коротко объясни.',
+  '10. Каждое текстовое поле: одно короткое предложение до 200 символов. steps: 4-6 пунктов.',
   '',
   'Отвечай только JSON без Markdown и без пояснений.'
 ].join('\n');
@@ -222,6 +223,7 @@ const REALITY_RULES_EN = [
   '7. success_metric and fail_criterion contain concrete numbers (for example, "of 10 people interviewed, at least 3 ask for a link or prepay"). ambiguous explains which results give no answer and what to do about them. Views and likes are not proof of willingness to pay.',
   '8. Do not suggest fraud, illegal or dangerous actions, spam, or messaging strangers without consent.',
   '9. If the request is not about a business idea, leave the fields empty and give a short explanation in refusal.',
+  '10. Every text field is one short sentence, up to 200 characters. steps: 4-6 items.',
   '',
   'Reply with JSON only, no Markdown and no commentary.'
 ].join('\n');
@@ -232,45 +234,78 @@ function level(v, def) {
   return LEVELS.includes(x) ? x : def;
 }
 
-function normalizeReality(raw) {
+function pickStr(o, keys, max) {
+  for (const k of keys) {
+    const v = o && o[k];
+    if (typeof v === 'string' && v.trim()) return v.trim().slice(0, max);
+  }
+  return '';
+}
+
+function toList(v, count, max) {
+  if (typeof v === 'string') v = v.split(/\n|;\s+|(?:^|\s)\d+[.)]\s+/).map((x) => x.replace(/^[-*•]\s*/, '').trim()).filter(Boolean);
+  return list(v, count, max);
+}
+
+function normalizeReality(input) {
+  let raw = input && typeof input === 'object' ? input : {};
+  for (const k of ['result', 'data', 'reality']) {
+    if (raw[k] && typeof raw[k] === 'object' && !Array.isArray(raw[k]) && (raw[k].risks || raw[k].experiment)) raw = raw[k];
+  }
   const refusal = str(raw.refusal, 300);
+
   const assumptions = (Array.isArray(raw.assumptions) ? raw.assumptions : [])
-    .map((a) => ({ text: str(a && a.text, 300), importance: level(a && a.importance, 'medium') }))
+    .map((a) => (typeof a === 'string'
+      ? { text: str(a, 300), importance: 'medium' }
+      : { text: pickStr(a, ['text', 'assumption', 'hypothesis', 'title'], 300), importance: level(a && a.importance, 'medium') }))
     .filter((a) => a.text)
     .slice(0, 6);
+
   const risks = (Array.isArray(raw.risks) ? raw.risks : [])
-    .map((r) => ({
-      title: str(r && r.title, 120),
-      why_critical: str(r && r.why_critical, 400),
-      if_wrong: str(r && r.if_wrong, 400),
-      confidence: level(r && r.confidence, 'low'),
-      cheapest_test: str(r && r.cheapest_test, 400)
-    }))
-    .filter((r) => r.title && r.cheapest_test)
+    .map((r) => (typeof r === 'string'
+      ? { title: str(r, 120), why_critical: '', if_wrong: '', confidence: 'low', cheapest_test: '' }
+      : {
+        title: pickStr(r, ['title', 'name', 'risk'], 120),
+        why_critical: pickStr(r, ['why_critical', 'why', 'description'], 400),
+        if_wrong: pickStr(r, ['if_wrong', 'consequence', 'impact'], 400),
+        confidence: level(r && r.confidence, 'low'),
+        cheapest_test: pickStr(r, ['cheapest_test', 'test', 'how_to_test'], 400)
+      }))
+    .filter((r) => r.title)
     .slice(0, 3);
+
   const e = raw.experiment && typeof raw.experiment === 'object' ? raw.experiment : {};
-  const experiment = {
-    title: str(e.title, 120),
-    hypothesis: str(e.hypothesis, 400),
-    why_now: str(e.why_now, 400),
-    steps: list(e.steps, 7, 300),
-    budget: str(e.budget, 200),
-    duration: str(e.duration, 120),
-    tools: list(e.tools, 6, 80),
-    success_metric: str(e.success_metric, 300),
-    fail_criterion: str(e.fail_criterion, 300),
-    ambiguous: str(e.ambiguous, 400),
-    next_if_success: str(e.next_if_success, 300),
-    next_if_fail: str(e.next_if_fail, 300),
-    next_if_ambiguous: str(e.next_if_ambiguous, 300)
-  };
-  if (refusal && !risks.length) return { refusal };
-  if (assumptions.length < 2 || risks.length < 1 || !experiment.title || experiment.steps.length < 2 || !experiment.hypothesis) return null;
   let primary = Math.round(Number(raw.primary_index));
   if (!(primary >= 0 && primary < risks.length)) primary = 0;
+  const prim = risks[primary];
+
+  const experiment = {
+    title: pickStr(e, ['title', 'name'], 120),
+    hypothesis: pickStr(e, ['hypothesis'], 400),
+    why_now: pickStr(e, ['why_now', 'why'], 400),
+    steps: toList(e.steps || e.actions, 7, 300),
+    budget: pickStr(e, ['budget'], 200),
+    duration: pickStr(e, ['duration', 'time'], 120),
+    tools: toList(e.tools, 6, 80),
+    success_metric: pickStr(e, ['success_metric', 'success'], 300),
+    fail_criterion: pickStr(e, ['fail_criterion', 'failure'], 300),
+    ambiguous: pickStr(e, ['ambiguous'], 400),
+    next_if_success: pickStr(e, ['next_if_success'], 300),
+    next_if_fail: pickStr(e, ['next_if_fail'], 300),
+    next_if_ambiguous: pickStr(e, ['next_if_ambiguous'], 300)
+  };
+  // Если модель недодала эксперимент, собираем минимальный из главного риска: лучше так, чем ошибка.
+  if (prim) {
+    if (!experiment.hypothesis) experiment.hypothesis = (assumptions[0] && assumptions[0].text) || prim.title;
+    if (!experiment.title) experiment.title = prim.title.slice(0, 100);
+    if (experiment.steps.length === 0 && prim.cheapest_test) experiment.steps = [prim.cheapest_test];
+  }
+
+  if (refusal && !risks.length) return { refusal };
+  if (!risks.length || !experiment.title || experiment.steps.length < 1) return null;
   return {
-    assumptions,
-    unknowns: list(raw.unknowns, 4, 300),
+    assumptions: assumptions.length ? assumptions : [{ text: experiment.hypothesis, importance: 'high' }],
+    unknowns: toList(raw.unknowns, 4, 300),
     risks,
     primary_index: primary,
     experiment
@@ -360,8 +395,37 @@ function parseModelJson(text) {
   try {
     return JSON.parse(t);
   } catch (e) {
-    return null;
+    return repairJson(text.slice(text.indexOf('{')));
   }
+}
+
+// Если ответ модели оборвался на длине, обрезаем до последней целой запятой и закрываем скобки.
+function repairJson(t) {
+  let inStr = false;
+  let esc = false;
+  const stack = [];
+  const cuts = [];
+  for (let i = 0; i < t.length; i++) {
+    const c = t[i];
+    if (inStr) {
+      if (esc) esc = false;
+      else if (c === '\\') esc = true;
+      else if (c === '"') inStr = false;
+      continue;
+    }
+    if (c === '"') inStr = true;
+    else if (c === '{' || c === '[') stack.push(c);
+    else if (c === '}' || c === ']') stack.pop();
+    else if (c === ',') cuts.push({ i, stack: stack.slice() });
+  }
+  for (let k = cuts.length - 1; k >= 0 && k >= cuts.length - 12; k--) {
+    const cut = cuts[k];
+    const closers = cut.stack.slice().reverse().map((x) => (x === '{' ? '}' : ']')).join('');
+    try {
+      return JSON.parse(t.slice(0, cut.i) + closers);
+    } catch (e) { /* пробуем более раннюю запятую */ }
+  }
+  return null;
 }
 
 function normalize(raw) {
@@ -439,6 +503,7 @@ async function callYandex(messages, schemaDef, key, folder) {
 module.exports = handler;
 module.exports.checkRate = checkRate;
 module.exports.normalizeReality = normalizeReality;
+module.exports.__parse = parseModelJson;
 async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
 
@@ -508,7 +573,7 @@ async function handler(req, res) {
       { role: 'user', content: buildUserMessage(mode, text, lang) }
     ];
   const defs = isReality
-    ? { name: 'razbor_reality', schema: REALITY_SCHEMA, maxTokens: 3200 }
+    ? { name: 'razbor_reality', schema: REALITY_SCHEMA, maxTokens: 4000 }
     : { name: 'razbor_idea', schema: SCHEMA, maxTokens: 2400 };
   const norm = isReality ? normalizeReality : normalize;
   const withSchema = Object.assign({ useSchema: true }, defs);

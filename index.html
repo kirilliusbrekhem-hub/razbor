@@ -343,6 +343,33 @@
   @media (max-width: 560px) { .pcard.row { grid-template-columns: 1fr; } .bar { grid-template-columns: 1fr 70px 3rem; } }
   @media (prefers-reduced-motion: reduce) { .skel { animation: none; } }
 
+  /* Меню и вкладки */
+  .nav { position: sticky; top: 0; z-index: 10; display: flex; gap: 8px; overflow-x: auto; padding: 10px 20px; margin: 14px -20px 0; background: var(--paper); border-bottom: 2px solid var(--ink); scrollbar-width: none; }
+  .nav::-webkit-scrollbar { display: none; }
+  .nav-b { flex: none; font: 600 0.92rem var(--font-body); padding: 0.45rem 0.9rem; border: 2px solid var(--ink); border-radius: 6px; background: var(--surface); color: var(--ink); cursor: pointer; white-space: nowrap; }
+  .nav-b:hover { background: var(--marker); color: #16213E; }
+  .nav-b[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+  .view[hidden] { display: none; }
+  .hero { padding: 26px 0 16px; }
+  .linkbtn { background: none; border: 0; padding: 0; font: 500 0.92rem var(--font-body); color: var(--pen); text-decoration: underline; cursor: pointer; }
+  .gtabs { display: flex; flex-wrap: wrap; gap: 6px; margin: 14px 0 0; padding-top: 14px; border-top: 1px dashed var(--line); }
+  .gtab { font: 600 0.88rem var(--font-body); padding: 0.35rem 0.8rem; border: 2px solid var(--ink); border-radius: 6px; background: var(--surface); color: var(--ink); cursor: pointer; }
+  .gtab:hover { background: var(--marker); color: #16213E; }
+  .gtab[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+  .gpane { margin-top: 4px; }
+  .gpane[hidden] { display: none; }
+  .gpane h3 { margin: 14px 0 2px; font: 600 0.95rem var(--font-body); color: var(--muted); }
+  .gpane p { margin: 0; max-width: 64ch; }
+  .gpane ul, .gpane ol { margin: 0; padding-left: 1.3rem; max-width: 64ch; }
+  .gpane .materials { margin-top: 10px; }
+  .gpane .materials h2 { font-size: 1.05rem; }
+  .ai-cap { margin: 4px 0 0; }
+  @media (max-width: 560px) { .nav { margin-left: -16px; margin-right: -16px; padding-left: 16px; padding-right: 16px; } }
+
+  details.fold { margin: 10px 0 0; border-top: 1px dashed var(--line); padding-top: 8px; }
+  details.fold > summary { cursor: pointer; font: 600 0.9rem var(--font-body); color: var(--muted); }
+  details.fold[open] > summary { margin-bottom: 6px; }
+
   footer { margin: 40px 0 0; padding: 20px 0 48px; border-top: 1px dashed var(--line); color: var(--muted); font-size: 0.88rem; }
   footer p { margin: 0 0 8px; max-width: 72ch; }
 
@@ -370,72 +397,83 @@
     </div>
   </header>
 
+  <nav class="nav" id="nav" aria-label="Menu">
+    <button type="button" class="nav-b" data-view="check"></button>
+    <button type="button" class="nav-b" data-view="projects"></button>
+    <button type="button" class="nav-b" data-view="example"></button>
+    <button type="button" class="nav-b" data-view="library"></button>
+    <button type="button" class="nav-b" data-view="how"></button>
+  </nav>
+
   <main>
     <section class="public-report" id="public-report" aria-live="polite" hidden></section>
-
-    <section class="hero" aria-labelledby="hero-title">
-      <h1 id="hero-title" data-i18n="heroTitle"></h1>
-      <p class="lead" data-i18n="lead"></p>
-      <ul class="aud" id="aud" aria-label="Audience"></ul>
-      <div class="hero-cta">
-        <button class="btn" id="hero-cta" type="button" data-i18n="heroCta"></button>
-        <button class="btn ghost" id="hero-how" type="button" data-i18n="heroHow"></button>
-        <span class="note" data-i18n="heroNote"></span>
-      </div>
-    </section>
-
     <noscript><p>JavaScript is required / Для работы сайта нужен JavaScript.</p></noscript>
 
-    <section class="sample" id="sample" aria-labelledby="sample-title">
-      <h2 id="sample-title" data-i18n="sampleTitle"></h2>
-      <p class="sub" data-i18n="sampleSub"></p>
-      <div id="sample-body"></div>
-      <div class="cta-row"><button class="btn" id="sample-cta" type="button" data-i18n="sampleCta"></button></div>
-    </section>
+    <div class="view" data-view="check">
+      <section class="hero" aria-labelledby="hero-title">
+        <h1 id="hero-title" data-i18n="heroTitle"></h1>
+        <p class="lead" data-i18n="lead"></p>
+      </section>
 
-    <section class="agent" id="agent" aria-labelledby="agent-title" style="margin-top:28px">
-      <h2 class="sr-only" id="agent-title" data-i18n="agentTitle"></h2>
-      <div class="modes" role="group" data-i18n-aria="modesAria">
-        <button type="button" class="mode" data-mode="generate" aria-pressed="true"></button>
-        <button type="button" class="mode" data-mode="analyze" aria-pressed="false"></button>
-      </div>
+      <section class="agent" id="agent" aria-labelledby="agent-title">
+        <h2 class="sr-only" id="agent-title" data-i18n="agentTitle"></h2>
+        <div class="modes" role="group" data-i18n-aria="modesAria">
+          <button type="button" class="mode" data-mode="generate" aria-pressed="true"></button>
+          <button type="button" class="mode" data-mode="analyze" aria-pressed="false"></button>
+        </div>
 
-      <label for="agent-input" id="agent-label"></label>
-      <textarea id="agent-input" maxlength="1200"></textarea>
-      <div class="examples" id="examples"></div>
+        <label for="agent-input" id="agent-label"></label>
+        <textarea id="agent-input" maxlength="1200"></textarea>
+        <div class="examples" id="examples"></div>
 
-      <div class="actions">
-        <button class="btn" id="agent-send" type="button"></button>
-        <span class="counter" id="counter" aria-hidden="true"></span>
-      </div>
-      <p class="status" id="agent-status" role="status"></p>
-      <p class="hint" data-i18n="hint"></p>
-    </section>
+        <div class="actions">
+          <button class="btn" id="agent-send" type="button"></button>
+          <button class="linkbtn" id="to-example" type="button" data-i18n="seeExample"></button>
+          <span class="counter" id="counter" aria-hidden="true"></span>
+        </div>
+        <p class="status" id="agent-status" role="status"></p>
+        <p class="hint" data-i18n="hint"></p>
+      </section>
 
-    <section class="result" id="result" aria-live="polite" hidden></section>
+      <section class="result" id="result" aria-live="polite" hidden></section>
+    </div>
 
-    <section class="workspace" id="workspace" aria-labelledby="ws-title">
-      <h2 id="ws-title"></h2>
-      <p class="sub" id="ws-sub"></p>
-      <div id="workspace-body"></div>
-    </section>
+    <div class="view" data-view="projects" hidden>
+      <section class="workspace" id="workspace" aria-labelledby="ws-title">
+        <h2 id="ws-title"></h2>
+        <p class="sub" id="ws-sub"></p>
+        <div id="workspace-body"></div>
+      </section>
+    </div>
 
-    <section class="method" id="method" aria-labelledby="method-title">
-      <h2 id="method-title" data-i18n="methTitle"></h2>
-      <div id="method-body"></div>
-    </section>
+    <div class="view" data-view="example" hidden>
+      <section class="sample" id="sample" aria-labelledby="sample-title">
+        <h2 id="sample-title" data-i18n="sampleTitle"></h2>
+        <p class="sub" data-i18n="sampleSub"></p>
+        <div id="sample-body"></div>
+        <div class="cta-row"><button class="btn" id="sample-cta" type="button" data-i18n="sampleCta"></button></div>
+      </section>
+    </div>
 
-    <section class="library" aria-labelledby="lib-title">
-      <h2 id="lib-title" data-i18n="libTitle"></h2>
-      <p class="sub" data-i18n="libSub"></p>
-      <div class="chips" id="chips" role="group" data-i18n-aria="topicAria"></div>
-      <div id="library-body"></div>
-    </section>
+    <div class="view" data-view="library" hidden>
+      <section class="library" aria-labelledby="lib-title">
+        <h2 id="lib-title" data-i18n="libTitle"></h2>
+        <p class="sub" data-i18n="libSub"></p>
+        <div class="chips" id="chips" role="group" data-i18n-aria="topicAria"></div>
+        <div id="library-body"></div>
+      </section>
+    </div>
+
+    <div class="view" data-view="how" hidden>
+      <section class="method" id="method" aria-labelledby="method-title">
+        <h2 id="method-title" data-i18n="methTitle"></h2>
+        <div id="method-body"></div>
+      </section>
+    </div>
   </main>
 
   <footer>
     <p data-i18n="foot1"></p>
-    <p data-i18n="foot2"></p>
   </footer>
 </div>
 
@@ -457,11 +495,10 @@
     ru: {
       docTitle: "razbor — Idea starts here.",
       heroTitle: "Узнай за 2 минуты, стоит ли запускать твою идею",
-      lead: "Агент оценит спрос и конкуренцию, прикинет затраты на старт, назовёт главные риски и придумает эксперимент на 48 часов, чтобы проверить идею в реальном мире, а не только на бумаге.",
-      aud: ["Начинающим предпринимателям", "Создателям онлайн-проектов", "Тем, кто запускается с маленьким бюджетом"],
-      heroCta: "Проверить идею",
-      heroHow: "Как это работает",
-      heroNote: "Без регистрации. Ниже готовый пример разбора.",
+      lead: "Для начинающих предпринимателей, создателей онлайн-проектов и тех, кто запускается с маленьким бюджетом. Найди главный риск и проверь его экспериментом за 48 часов.",
+      navCheck: "Проверить идею", navProjects: "Проекты", navExample: "Пример", navLibrary: "Идеи и материалы", navHow: "Как это работает",
+      seeExample: "Посмотреть пример",
+      gSense: "Суть", gMoney: "Деньги и риски", gPlan: "План", gMat: "Материалы",
       sampleTitle: "Пример полного разбора",
       sampleSub: "Так выглядит результат. Читай сразу, без регистрации, потом проверь свою идею.",
       sampleTag: "Пример",
@@ -487,14 +524,14 @@
       libSub: "Примеры по популярным направлениям. Выбери направление и посмотри, как выглядит разбор.",
       topicAria: "Направление",
       foot1: "Оценки и вердикты в разборах — мнение ИИ и автора сайта, а не факты и не финансовая или юридическая консультация. Цифры и правила проверяй по официальным источникам.",
-      foot2: "Ссылки на материалы подобраны вручную. Если ссылки нет, кнопка ведёт на поиск: так не получится попасть на несуществующую страницу.",
+      foot2: "",
       generateLabel: "Расскажи, что умеешь и что любишь (можно оставить пустым)",
       generatePh: "Например: люблю игры, умею монтировать видео, денег на старт нет",
       generateBtn: "Придумать идею",
       generateEx: ["Люблю игры и монтирую видео", "Хорошо рисую", "Интересуюсь ИИ и деньгами", "Не знаю, придумай сам"],
       analyzeLabel: "Опиши свою идею",
       analyzePh: "Например: сайт, где школьники учатся копить на первую покупку и считают, сколько откладывать",
-      analyzeBtn: "Разобрать идею",
+      analyzeBtn: "Проверить идею",
       analyzeEx: ["Бот, который отвечает на отзывы кафе", "Калькулятор прибыли для продавцов на маркетплейсах"],
       statusGen: "Придумываю идею и собираю разбор…",
       statusAn: "Разбираю идею…",
@@ -533,11 +570,10 @@
     en: {
       docTitle: "razbor — Idea starts here.",
       heroTitle: "Find out in 2 minutes whether your idea is worth launching",
-      lead: "The agent rates demand and competition, estimates start-up costs, names the main risks and designs a 48-hour experiment, so you test the idea in the real world, not only on paper.",
-      aud: ["Beginner entrepreneurs", "Creators of online projects", "People launching on a small budget"],
-      heroCta: "Validate your idea",
-      heroHow: "See how it works",
-      heroNote: "No sign-up. A ready sample review is just below.",
+      lead: "For beginner entrepreneurs, creators of online projects and people launching on a small budget. Find the main risk and test it with a 48-hour experiment.",
+      navCheck: "Validate your idea", navProjects: "Projects", navExample: "Sample", navLibrary: "Ideas and materials", navHow: "How it works",
+      seeExample: "See a sample",
+      gSense: "Essence", gMoney: "Money and risks", gPlan: "Plan", gMat: "Materials",
       sampleTitle: "A full sample review",
       sampleSub: "This is what you get. Read it right away, no sign-up, then check your own idea.",
       sampleTag: "Sample",
@@ -563,14 +599,14 @@
       libSub: "Examples across popular areas. Pick an area and see what a review looks like.",
       topicAria: "Area",
       foot1: "Scores and verdicts in the reviews are the opinion of the AI and the site author, not facts and not financial or legal advice. Check numbers and rules against official sources.",
-      foot2: "Links to materials are picked by hand. If there is no direct link, the button leads to a search, so you cannot land on a page that does not exist.",
+      foot2: "",
       generateLabel: "Tell us what you can do and what you like (you can leave it empty)",
       generatePh: "For example: I like games, I can edit video, I have no money to start",
       generateBtn: "Come up with an idea",
       generateEx: ["I like games and edit videos", "I draw well", "I am into AI and money", "No idea, you decide"],
       analyzeLabel: "Describe your idea",
       analyzePh: "For example: a site where students learn to save for a first purchase and calculate how much to set aside",
-      analyzeBtn: "Review the idea",
+      analyzeBtn: "Validate your idea",
       analyzeEx: ["A bot that replies to cafe reviews", "A profit calculator for marketplace sellers"],
       statusGen: "Coming up with an idea and building the review…",
       statusAn: "Reviewing the idea…",
@@ -759,6 +795,26 @@
     return el("div", { class: "made-row" }, [link]);
   }
 
+  var gtabCounter = 0;
+  /* Вкладки внутри карточки: groups = [{label, nodes[]}] */
+  function groupTabs(groups) {
+    gtabCounter += 1;
+    var id = gtabCounter;
+    var bar = el("div", { class: "gtabs", role: "group" });
+    var panes = [];
+    var buttons = [];
+    groups.forEach(function (g, i) {
+      var b = el("button", { type: "button", class: "gtab", "aria-pressed": i === 0 ? "true" : "false", text: g.label });
+      var pane = el("div", { class: "gpane", id: "gp-" + id + "-" + i }, g.nodes.filter(Boolean));
+      if (i !== 0) pane.hidden = true;
+      b.addEventListener("click", function () {
+        panes.forEach(function (pn, j) { pn.hidden = j !== i; buttons[j].setAttribute("aria-pressed", j === i ? "true" : "false"); });
+      });
+      buttons.push(b); panes.push(pane); bar.appendChild(b);
+    });
+    return el("div", { class: "gtabset" }, [bar].concat(panes));
+  }
+
   function noticeBlock() {
     return el("p", { class: "notice" }, [el("strong", { text: t("noticeTitle") }), document.createTextNode(t("noticeText"))]);
   }
@@ -857,33 +913,39 @@
     }
     actions.appendChild(copyStatus);
 
+    var mat = materialsBlock(res.tags || [], t("matIdea"), t("matIdeaSub"));
+    var groups = [
+      { label: t("gSense"), nodes: [
+        section(t("sPeople"), el("p", { text: res.audience })),
+        section(t("sPain"), el("p", { text: res.pain })),
+        section(t("sHow"), el("p", { text: res.how_it_works })),
+        section(t("sComp"), el("p", { text: res.competitors }))
+      ] },
+      { label: t("gMoney"), nodes: [
+        section(t("sMoney"), el("p", { text: res.money })),
+        res.cost ? section(t("sCost"), el("p", { text: res.cost })) : null,
+        el("div", { class: "risk" }, [el("h3", { text: t("sRisks") }), risks]),
+        section(t("sImprove"), el("p", { text: res.improve }))
+      ] },
+      { label: t("gPlan"), nodes: [
+        validateBlock,
+        section(hasWeek ? t("sWeek") : t("sSteps"), steps),
+        checkBlock
+      ] }
+    ];
+    if (mat) groups.push({ label: t("gMat"), nodes: [mat] });
+
     var card = el("div", { class: "result-card" }, [
       el("h2", { class: "result-title", text: res.title }),
       el("p", { class: "pitch", text: res.pitch }),
       el("p", { class: "verdict", text: res.verdict }),
-      noticeBlock(),
       scoresBlock(res.scores),
-      el("p", { class: "ai-cap", text: t("aiCap") }),
-      el("div", { class: "sections" }, [
-        section(t("sPeople"), el("p", { text: res.audience })),
-        section(t("sPain"), el("p", { text: res.pain })),
-        section(t("sHow"), el("p", { text: res.how_it_works })),
-        section(t("sMoney"), el("p", { text: res.money })),
-        res.cost ? section(t("sCost"), el("p", { text: res.cost })) : null,
-        section(t("sComp"), el("p", { text: res.competitors })),
-        validateBlock,
-        el("div", { class: "risk" }, [el("h3", { text: t("sRisks") }), risks]),
-        section(t("sImprove"), el("p", { text: res.improve })),
-        section(hasWeek ? t("sWeek") : t("sSteps"), steps),
-        checkBlock
-      ]),
+      el("p", { class: "ai-cap", text: t("aiCap") + ". " + t("noticeTitle") + t("noticeText") }),
+      groupTabs(groups),
       actions,
       madeBadge()
     ]);
     box.appendChild(card);
-
-    var mat = materialsBlock(res.tags || [], t("matIdea"), t("matIdeaSub"));
-    if (mat) box.appendChild(mat);
 
     if (scroll) box.scrollIntoView({ behavior: "smooth", block: "start" });
   }
@@ -1033,14 +1095,22 @@
       idea.to_check.forEach(function (c) { check.appendChild(el("li", { text: c })); });
     }
     var body = el("div", { class: "idea-body" }, [
-      idea.week ? noticeBlock() : null,
-      el("div", null, [el("h4", { text: t("what") }), el("p", { text: idea.what })]),
-      el("div", null, [el("h4", { text: t("money") }), el("p", { text: idea.money })]),
-      idea.cost ? el("div", null, [el("h4", { text: t("sCost") }), el("p", { text: idea.cost })]) : null,
-      validate ? el("div", null, [el("h4", { text: t("sValidate") }), validate]) : null,
-      el("div", { class: "risk" }, [el("h4", { text: t("risks") }), el("p", { text: idea.risks })]),
-      el("div", null, [el("h4", { text: idea.week ? t("sWeek") : t("steps") }), steps]),
-      check ? el("div", { class: "check" }, [el("h4", { text: t("sCheck") }), check]) : null,
+      idea.week ? el("p", { class: "ai-cap", text: t("aiCap") + ". " + t("noticeTitle") + t("noticeText") }) : null,
+      groupTabs([
+        { label: t("gSense"), nodes: [
+          el("div", null, [el("h4", { text: t("what") }), el("p", { text: idea.what })]),
+          el("div", null, [el("h4", { text: t("money") }), el("p", { text: idea.money })])
+        ] },
+        { label: t("gMoney"), nodes: [
+          idea.cost ? el("div", null, [el("h4", { text: t("sCost") }), el("p", { text: idea.cost })]) : null,
+          el("div", { class: "risk" }, [el("h4", { text: t("risks") }), el("p", { text: idea.risks })])
+        ] },
+        { label: t("gPlan"), nodes: [
+          validate ? el("div", null, [el("h4", { text: t("sValidate") }), validate]) : null,
+          el("div", null, [el("h4", { text: idea.week ? t("sWeek") : t("steps") }), steps]),
+          check ? el("div", { class: "check" }, [el("h4", { text: t("sCheck") }), check]) : null
+        ] }
+      ]),
       madeBadge()
     ]);
     var d = el("details", { class: "idea" }, [summary, body]);
@@ -1109,21 +1179,42 @@
     body.appendChild(el("p", { text: t("methVerifyText") }));
   }
 
-  function renderAud() {
-    var ul = $("aud");
-    ul.textContent = "";
-    t("aud").forEach(function (x) { ul.appendChild(el("li", { text: x })); });
+  function goAgent() {
+    showView("check");
+    applyMode("analyze");
+    $("agent-input").focus();
   }
 
-  function goAgent() {
-    var a = $("agent");
-    a.scrollIntoView({ behavior: "smooth", block: "start" });
-    applyMode("analyze");
-    $("agent-input").focus({ preventScroll: true });
+  /* ---------- Меню: показываем один раздел за раз ---------- */
+
+  var VIEWS = ["check", "projects", "example", "library", "how"];
+  var NAV_KEYS = { check: "navCheck", projects: "navProjects", example: "navExample", library: "navLibrary", how: "navHow" };
+  var currentView = "check";
+
+  function showView(name, noScroll) {
+    if (VIEWS.indexOf(name) === -1) name = "check";
+    currentView = name;
+    Array.prototype.forEach.call(document.querySelectorAll(".view"), function (v) {
+      v.hidden = v.getAttribute("data-view") !== name;
+    });
+    Array.prototype.forEach.call(document.querySelectorAll(".nav-b"), function (b) {
+      var on = b.getAttribute("data-view") === name;
+      b.setAttribute("aria-pressed", on ? "true" : "false");
+      if (on) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current");
+    });
+    try { if (/^https?:$/.test(location.protocol) && !/^#report=/.test(location.hash)) history.replaceState(null, "", "#" + name); } catch (e) { /* ignore */ }
+    if (!noScroll) window.scrollTo({ top: 0, behavior: "smooth" });
   }
-  $("hero-cta").addEventListener("click", goAgent);
+  Array.prototype.forEach.call(document.querySelectorAll(".nav-b"), function (b) {
+    b.addEventListener("click", function () { showView(b.getAttribute("data-view")); });
+  });
+  function viewFromHash() {
+    var h = (location.hash || "").replace("#", "");
+    return VIEWS.indexOf(h) !== -1 ? h : null;
+  }
+  window.addEventListener("hashchange", function () { var v = viewFromHash(); if (v && v !== currentView) showView(v, true); });
   $("sample-cta").addEventListener("click", goAgent);
-  $("hero-how").addEventListener("click", function () { $("method").scrollIntoView({ behavior: "smooth", block: "start" }); });
+  $("to-example").addEventListener("click", function () { showView("example"); });
 
   /* ---------- Язык ---------- */
 
@@ -1136,13 +1227,15 @@
     Array.prototype.forEach.call(document.querySelectorAll("[data-i18n-aria]"), function (n) {
       n.setAttribute("aria-label", t(n.getAttribute("data-i18n-aria")));
     });
+    Array.prototype.forEach.call(document.querySelectorAll(".nav-b"), function (b) {
+      b.textContent = t(NAV_KEYS[b.getAttribute("data-view")]);
+    });
     document.querySelector('.mode[data-mode="generate"]').textContent = t("modeGenerate");
     document.querySelector('.mode[data-mode="analyze"]').textContent = t("modeAnalyze");
     Array.prototype.forEach.call(document.querySelectorAll(".lang button"), function (b) {
       b.setAttribute("aria-pressed", b.getAttribute("data-lang") === LANG ? "true" : "false");
     });
     applyMode(mode);
-    renderAud();
     renderSample();
     renderMethod();
     renderChips();
@@ -1167,9 +1260,10 @@
   });
 
   window.RZApp = {
-    el: el, $: $, lang: function () { return LANG; }, api: api, copy: copyText
+    el: el, $: $, lang: function () { return LANG; }, api: api, copy: copyText, showView: showView
   };
   applyLang();
+  showView(viewFromHash() || "check", true);
 })();
 </script>
 <script src="projects.js"></script>

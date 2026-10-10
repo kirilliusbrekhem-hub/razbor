@@ -21,7 +21,7 @@
       back: "← Все проекты", exportBtn: "Скачать данные", updated: "Обновлён: ", exps: "экспериментов: ",
       createProject: "Создать проект и запустить Reality Check",
       created: "Проект создан. Идёт Reality Check…",
-      tabs: { overview: "Обзор", diagnosis: "Диагноз идеи", risks: "Критичные риски", experiments: "Эксперименты", evidence: "Доска гипотез", history: "История", move: "Следующий шаг" },
+      tabs: { overview: "Обзор", risks: "Риски", experiments: "Эксперимент", evidence: "Гипотезы", share: "Поделиться" },
       tabsAria: "Разделы проекта",
       realityRun: "Запустить Reality Check", realityRetry: "Повторить Reality Check",
       realityWait: "Ищу самые опасные допущения и придумываю эксперимент. Обычно это до минуты.",
@@ -54,6 +54,7 @@
       conf: { high: "высокая", medium: "средняя", low: "низкая" },
       expNone: "Экспериментов пока нет.", expCurrent: "Текущий эксперимент", expDone: "Завершённые эксперименты",
       expStart: "Начать эксперимент", expPlanned: "Запланирован", expActive: "Идёт", expFinished: "Завершён",
+      expDetails: "Метрики, критерии и что делать дальше",
       expDisclaimer: "48 часов это целевой срок, а не обещание результата. Эксперимент не гарантирует ни продаж, ни надёжной статистики.",
       expHyp: "Проверяемая гипотеза", expWhy: "Почему проверять сейчас", expSteps: "Действия по порядку", expBudget: "Примерный бюджет",
       expTime: "Время", expTools: "Инструменты", expSuccess: "Метрика успеха", expFail: "Критерий неудачи",
@@ -89,6 +90,7 @@
       hNew: "Добавить гипотезу", hNewPh: "Например: люди готовы платить за это больше 500 в месяц", hNewBtn: "Добавить",
       histTitle: "История прогресса", histNone: "История пока пуста.",
       h: { created: "Проект создан", reality: "Reality Check готов", expStart: "Эксперимент начат: ", expDone: "Эксперимент завершён: ", status: "Статус гипотезы изменён: ", move: "Решение по шагу: ", hyp: "Добавлена гипотеза: ", evidence: "Добавлено свидетельство" },
+      moveTitle: "Следующий шаг",
       moveNone: "Следующий шаг появится после первого завершённого эксперимента: рекомендация опирается на твои реальные результаты.",
       moveBasis: "На чём основано: ", moveTime: "Время: ", moveMoney: "Деньги: ", moveUseful: "Полезный результат: ",
       accept: "Принять", decline: "Отклонить", alt: "Выбрать другой", accepted: "Принято: создан эксперимент", declined: "Отклонено", altChosen: "Выбрано как альтернатива: создан эксперимент",
@@ -126,7 +128,7 @@
       back: "← All projects", exportBtn: "Download data", updated: "Updated: ", exps: "experiments: ",
       createProject: "Create a project and run Reality Check",
       created: "Project created. Running Reality Check…",
-      tabs: { overview: "Overview", diagnosis: "Idea diagnosis", risks: "Critical risks", experiments: "Experiments", evidence: "Evidence board", history: "Progress history", move: "Next move" },
+      tabs: { overview: "Overview", risks: "Risks", experiments: "Experiment", evidence: "Hypotheses", share: "Share" },
       tabsAria: "Project sections",
       realityRun: "Run Reality Check", realityRetry: "Retry Reality Check",
       realityWait: "Finding the most dangerous assumptions and designing an experiment. This usually takes up to a minute.",
@@ -159,6 +161,7 @@
       conf: { high: "high", medium: "medium", low: "low" },
       expNone: "No experiments yet.", expCurrent: "Current experiment", expDone: "Completed experiments",
       expStart: "Start the experiment", expPlanned: "Planned", expActive: "In progress", expFinished: "Completed",
+      expDetails: "Metrics, criteria and what to do next",
       expDisclaimer: "48 hours is a target, not a promise of results. An experiment guarantees neither sales nor reliable statistics.",
       expHyp: "Hypothesis being tested", expWhy: "Why test it now", expSteps: "Steps in order", expBudget: "Approximate budget",
       expTime: "Time", expTools: "Tools", expSuccess: "Success metric", expFail: "Failure criterion",
@@ -194,6 +197,7 @@
       hNew: "Add a hypothesis", hNewPh: "For example: people would pay more than 10 a month for this", hNewBtn: "Add",
       histTitle: "Progress history", histNone: "The history is empty.",
       h: { created: "Project created", reality: "Reality Check ready", expStart: "Experiment started: ", expDone: "Experiment completed: ", status: "Hypothesis status changed: ", move: "Decision on a step: ", hyp: "Hypothesis added: ", evidence: "Evidence added" },
+      moveTitle: "Next move",
       moveNone: "The next move appears after the first completed experiment: the recommendation is based on your real results.",
       moveBasis: "Based on: ", moveTime: "Time: ", moveMoney: "Money: ", moveUseful: "Useful result: ",
       accept: "Accept", decline: "Decline", alt: "Choose another", accepted: "Accepted: an experiment was created", declined: "Declined", altChosen: "Chosen as an alternative: an experiment was created",
@@ -306,8 +310,7 @@
     tab = "overview";
     notice = "";
     render();
-    var ws = $("workspace");
-    if (ws) ws.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (A.showView) A.showView("projects");
     runReality(pr);
     return pr;
   }
@@ -405,18 +408,18 @@
       ]);
       bars.appendChild(row);
     });
-    box.appendChild(bars);
-    box.appendChild(el("h4", { text: p("evSources") }));
-    box.appendChild(ul([
+    var more = el("details", { class: "fold" }, [el("summary", { text: p("evSources") }), bars]);
+    more.appendChild(ul([
       p("evUser") + ": " + fmt(p("evUserVal"), { n: pr.reality ? pr.reality.assumptions.length : 0 }),
       p("evAi") + ": " + p("evAiVal"),
       p("evExt") + ": " + p("evExtVal"),
       p("evExp") + ": " + fmt(p("evExpVal"), { n: rs.experiments })
     ]));
     if (hints.length) {
-      box.appendChild(el("h4", { text: p("hintsTitle") }));
-      box.appendChild(ul(hints.map(function (k) { return p("hints")[k]; })));
+      more.appendChild(el("h4", { text: p("hintsTitle") }));
+      more.appendChild(ul(hints.map(function (k) { return p("hints")[k]; })));
     }
+    box.appendChild(more);
     return box;
   }
 
@@ -438,7 +441,6 @@
     } else {
       out.appendChild(realityGate(pr));
     }
-    out.appendChild(shareBlock(pr));
     return out;
   }
 
@@ -465,15 +467,20 @@
     var out = el("div");
     pr.reality.risks.forEach(function (r, i) {
       var isP = i === pr.reality.primary_index;
-      out.appendChild(el("div", { class: "pcard" + (isP ? " primary" : "") }, [
+      var card = el("div", { class: "pcard" + (isP ? " primary" : "") }, [
         isP ? chip(p("primaryBadge"), "badge") : null,
         el("h3", { class: "ph", text: r.title }),
-        block(p("riskWhy"), r.why_critical),
-        block(p("riskIfWrong"), r.if_wrong),
-        block(p("riskConf"), p("conf")[r.confidence]),
         block(p("riskTest"), r.cheapest_test)
-      ]));
+      ]);
+      var det = el("details", { class: "fold" }, [el("summary", { text: p("riskWhy") }),
+        block(p("riskWhy"), r.why_critical), block(p("riskIfWrong"), r.if_wrong), block(p("riskConf"), p("conf")[r.confidence])]);
+      if (isP) det.setAttribute("open", "");
+      card.appendChild(det);
+      out.appendChild(card);
     });
+    var dg = el("details", { class: "fold" }, [el("summary", { text: p("assumptionsT") })]);
+    dg.appendChild(tabDiagnosis(pr));
+    out.appendChild(dg);
     return out;
   }
 
@@ -541,19 +548,21 @@
     });
     if (e.steps.length) { card.appendChild(el("h4", { text: p("expSteps") })); card.appendChild(stepsOl); }
 
+    var fold = el("details", { class: "fold" }, [el("summary", { text: p("expDetails") })]);
     var meta = el("dl", { class: "meta" });
     [[p("expBudget"), e.budget], [p("expTime"), e.duration], [p("expTools"), (e.tools || []).join(", ")],
       [p("expSuccess"), e.success_metric], [p("expFail"), e.fail_criterion], [p("expAmb"), e.ambiguous]].forEach(function (r) {
       if (r[1]) meta.appendChild(el("div", null, [el("dt", { text: r[0] }), el("dd", { text: r[1] })]));
     });
-    card.appendChild(meta);
-    if (e.kind === "ai") card.appendChild(el("p", { class: "muted", text: p("aiNote") }));
+    fold.appendChild(meta);
+    if (e.kind === "ai") fold.appendChild(el("p", { class: "muted", text: p("aiNote") }));
     if (e.next_if_success || e.next_if_fail || e.next_if_ambiguous) {
-      card.appendChild(el("h4", { text: p("expNext") }));
-      card.appendChild(ul([e.next_if_success && p("ifSuccess") + e.next_if_success, e.next_if_fail && p("ifFail") + e.next_if_fail,
+      fold.appendChild(el("h4", { text: p("expNext") }));
+      fold.appendChild(ul([e.next_if_success && p("ifSuccess") + e.next_if_success, e.next_if_fail && p("ifFail") + e.next_if_fail,
         e.next_if_ambiguous && p("ifAmb") + e.next_if_ambiguous].filter(Boolean)));
     }
-    if (e.kind === "ai") card.appendChild(el("p", { class: "notice", text: p("expDisclaimer") }));
+    if (e.kind === "ai") fold.appendChild(el("p", { class: "notice", text: p("expDisclaimer") }));
+    card.appendChild(fold);
 
     if (e.status === "planned") {
       card.appendChild(btn(p("expStart"), "", function () {
@@ -565,7 +574,9 @@
       return card;
     }
 
-    /* Наблюдения */
+    /* Наблюдения и ссылки: свёрнуты */
+    var notes = el("details", { class: "fold" }, [el("summary", { text: p("obsT") + " / " + p("linksT") })]);
+    var realCard = card; card = notes;
     card.appendChild(el("h4", { text: p("obsT") }));
     if (e.observations.length) {
       card.appendChild(ul(e.observations.map(function (o) { return dateStr(o.date) + ": " + o.text; })));
@@ -600,6 +611,8 @@
       card.appendChild(lerr);
     }
 
+    card = realCard;
+    card.appendChild(notes);
     /* Результаты */
     card.appendChild(el("h4", { text: p("resultsT") }));
     card.appendChild(el("p", { class: "muted", text: p("resultsHint") }));
@@ -652,8 +665,11 @@
     open.forEach(function (e) { out.appendChild(experimentCard(pr, e)); });
     out.appendChild(manualExperimentForm(pr));
     if (done.length) {
-      out.appendChild(h3(p("expDone")));
-      done.forEach(function (e) { out.appendChild(experimentCard(pr, e)); });
+      out.appendChild(h3(p("moveTitle")));
+      out.appendChild(tabMove(pr));
+      var dd = el("details", { class: "fold" }, [el("summary", { text: p("expDone") + " (" + done.length + ")" })]);
+      done.forEach(function (e) { dd.appendChild(experimentCard(pr, e)); });
+      out.appendChild(dd);
     }
     return out;
   }
@@ -708,12 +724,14 @@
       log(pr, "hyp", v.slice(0, 80)); touch(pr); render();
     }));
     out.appendChild(det);
+    var hd = el("details", { class: "fold" }, [el("summary", { text: p("histTitle") })]);
+    hd.appendChild(tabHistory(pr));
+    out.appendChild(hd);
     return out;
   }
 
   function tabHistory(pr) {
     var out = el("div");
-    out.appendChild(h3(p("histTitle")));
     if (!pr.history.length) { out.appendChild(el("p", { class: "muted", text: p("histNone") })); return out; }
     var ol = el("ul", { class: "timeline" });
     pr.history.slice(0, 80).forEach(function (x) {
@@ -765,7 +783,7 @@
           pr.decisions.push({ date: now(), expId: e.id, moveId: mv.id, decision: kind });
           log(pr, "move", mv.title + " — " + (kind === "declined" ? p("declined") : kind === "alt" ? p("altChosen") : p("accepted")));
           if (kind !== "declined") startExperimentFromMove(pr, mv);
-          touch(pr); if (kind !== "declined") tab = "experiments"; render();
+          touch(pr); render();
         }
         row.appendChild(btn(i === 0 ? p("accept") : p("alt"), "", function () { decide(i === 0 ? "accepted" : "alt"); }));
         row.appendChild(btn(p("decline"), "ghost", function () { decide("declined"); }));
@@ -919,7 +937,7 @@
       el("p", null, [chip(D.labels[rep.s], "lab-" + rep.s.toLowerCase()), document.createTextNode(" " + rep.v + "/100 · " + rep.n + " " + D.shareExps)]),
       el("p", { class: "verdict", text: rep.k }),
       el("p", { class: "muted", text: D.scoreNote }),
-      el("a", { class: "btn", href: "#agent", text: D.shareCta })
+      el("a", { class: "btn", href: "#check", text: D.shareCta })
     ]);
     holder.appendChild(card);
   }
@@ -963,8 +981,8 @@
     body.appendChild(el("div", { class: "result-actions" }, [btn(p("exportBtn"), "ghost", exportData)]));
   }
 
-  var TAB_KEYS = ["overview", "diagnosis", "risks", "experiments", "evidence", "history", "move"];
-  var TABS = { overview: tabOverview, diagnosis: tabDiagnosis, risks: tabRisks, experiments: tabExperiments, evidence: tabEvidence, history: tabHistory, move: tabMove };
+  var TAB_KEYS = ["overview", "risks", "experiments", "evidence", "share"];
+  var TABS = { overview: tabOverview, risks: tabRisks, experiments: tabExperiments, evidence: tabEvidence, share: shareBlock };
 
   function render() {
     var body = $("workspace-body");

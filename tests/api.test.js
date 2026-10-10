@@ -33,6 +33,8 @@ test('normalizeReality clamps enums and primary index, drops model numbers', () 
 
 test('normalizeReality rejects empty experiment', () => {
   assert.strictEqual(handler.normalizeReality({ assumptions: [], risks: [] }), null);
+  const loose = handler.normalizeReality({ risks: ['Only a title'], experiment: { steps: '1. one\n2. two' } });
+  assert.ok(loose && loose.experiment.steps.length === 2 && loose.risks[0].title === 'Only a title');
 });
 
 test('per-minute limit returns 429 with Retry-After', async () => {
@@ -55,4 +57,11 @@ test('reality validates input and mode', async () => {
   assert.strictEqual((await call({ mode: 'reality', idea: {} }, '9.9.9.9')).code, 400);
   assert.strictEqual((await call({ mode: 'hack' }, '9.9.9.9')).code, 400);
   assert.strictEqual((await call({ mode: 'analyze', text: 'x'.repeat(2000) }, '9.9.9.9')).code, 400);
+});
+
+test('truncated model JSON is repaired', () => {
+  const parse = (t) => require('../api/agent.js').__parse(t);
+  const cut = '{"risks":[{"title":"a","cheapest_test":"b"},{"title":"c","cheapest_test":"d"}],"experiment":{"title":"e","steps":["s1","s2"],"budget":"0","duration":"48';
+  const r = parse(cut);
+  assert.ok(r && r.risks.length === 2 && r.experiment.steps.length === 2);
 });
