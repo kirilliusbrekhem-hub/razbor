@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Разбор: бизнес-идеи, которые проверил ИИ</title>
+<meta name="description" content="Выбери тему и сразу получи разборы бизнес-идей: спрос, лёгкость старта, риски и первые шаги. Плюс книги по теме и запрос для проверки своей идеи.">
+<meta name="color-scheme" content="light dark">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Golos+Text:wght@400;500;600&family=Unbounded:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #F6F8FC;
+    --surface: #FFFFFF;
+    --grid: rgba(43, 75, 219, 0.10);
+    --ink: #16213E;
+    --muted: #56617F;
+    --line: #C3CCE2;
+    --pen: #2B4BDB;
+    --marker: #FFE14D;
+    --red: #C8372B;
+
+    --font-display: "Unbounded", "Arial Black", system-ui, sans-serif;
+    --font-body: "Golos Text", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --font-hand: "Caveat", "Segoe Print", "Bradley Hand", cursive;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #0E1630;
+      --surface: #152042;
+      --grid: rgba(140, 165, 255, 0.10);
+      --ink: #E9EDFA;
+      --muted: #9AA6C8;
+      --line: #2C3860;
+      --pen: #9DB0FF;
+      --red: #FF8E81;
+    }
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html { scroll-padding-top: 16px; }
+
+  body {
+    margin: 0;
+    background-color: var(--paper);
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 28px 28px;
+    color: var(--ink);
+    font: 400 1.0625rem/1.6 var(--font-body);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 880px; margin: 0 auto; padding: 0 20px; }
+
+  :focus-visible { outline: 3px solid var(--pen); outline-offset: 3px; }
+
+  /* Шапка */
+  .top { padding: 22px 0 0; display: flex; justify-content: space-between; align-items: baseline; gap: 16px; flex-wrap: wrap; }
+  .brand { font: 700 1.05rem var(--font-display); letter-spacing: -0.01em; }
+  .top p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+
+  /* Первый экран */
+  .hero { padding: 48px 0 24px; }
+  h1 {
+    margin: 0 0 16px;
+    font: 700 clamp(1.9rem, 5.6vw, 3.1rem)/1.12 var(--font-display);
+    letter-spacing: -0.02em;
+    max-width: 18ch;
+  }
+  .lead { margin: 0 0 28px; max-width: 58ch; color: var(--muted); }
+
+  .picker-label { margin: 0 0 10px; font-weight: 600; }
+  .chips { display: flex; flex-wrap: wrap; gap: 10px; }
+  .chip {
+    font: 600 0.95rem var(--font-body);
+    padding: 0.6rem 1rem;
+    border: 2px solid var(--ink);
+    border-radius: 6px;
+    background: var(--surface);
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .chip:hover { background: var(--marker); color: #16213E; }
+  .chip[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+
+  /* Блок выбранной темы */
+  .topic { padding: 32px 0 8px; }
+  h2 { margin: 0 0 8px; font: 700 clamp(1.4rem, 3.6vw, 1.9rem)/1.2 var(--font-display); letter-spacing: -0.01em; }
+  .topic-intro { margin: 0 0 20px; max-width: 62ch; }
+  .legend { margin: 0 0 14px; font-size: 0.88rem; color: var(--muted); max-width: 70ch; }
+
+  /* Разбор идеи */
+  .idea { border: 2px solid var(--ink); background: var(--surface); margin: 0 0 14px; border-radius: 6px; }
+  .idea summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 16px 18px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 6px 20px;
+    align-items: start;
+  }
+  .idea summary::-webkit-details-marker { display: none; }
+  .idea h3 { margin: 0; font: 500 1.02rem/1.35 var(--font-display); }
+  .verdict {
+    grid-column: 1;
+    margin: 0;
+    font: 600 1.5rem/1.15 var(--font-hand);
+    color: var(--pen);
+    transform: rotate(-0.7deg);
+    transform-origin: left center;
+  }
+  .scores { grid-column: 2; grid-row: 1 / span 2; margin: 0; display: grid; gap: 4px; font-size: 0.82rem; }
+  .score { display: grid; grid-template-columns: 3.4rem auto; align-items: center; gap: 8px; }
+  .score dt { color: var(--muted); }
+  .score dd { margin: 0; display: flex; gap: 3px; }
+  .dot { width: 10px; height: 10px; border: 2px solid var(--ink); border-radius: 50%; }
+  .dot.on { background: var(--ink); }
+  .toggle { grid-column: 1; font-size: 0.85rem; color: var(--muted); }
+  .toggle::before { content: "+ "; font-weight: 600; }
+  .idea[open] .toggle::before { content: "\2212  "; }
+  .idea[open] .toggle .t-open { display: none; }
+  .idea:not([open]) .toggle .t-close { display: none; }
+
+  .idea-body { padding: 4px 18px 18px; border-top: 1px dashed var(--line); display: grid; gap: 14px; }
+  .idea-body h4 { margin: 14px 0 2px; font: 600 0.95rem var(--font-body); color: var(--muted); }
+  .idea-body p { margin: 0; max-width: 64ch; }
+  .risk { border-left: 4px solid var(--red); padding-left: 12px; }
+  .steps { margin: 0; padding-left: 1.3rem; max-width: 64ch; }
+  .steps li { margin: 0 0 4px; }
+
+  /* Книги */
+  .books-block { padding: 28px 0 8px; }
+  .books { list-style: none; margin: 0; padding: 0; }
+  .books li { padding: 12px 0; border-top: 1px dashed var(--line); max-width: 68ch; }
+  .books li:last-child { border-bottom: 1px dashed var(--line); }
+  .book-title { font-weight: 600; }
+  .book-author { color: var(--muted); }
+  .book-note { margin: 2px 0 0; }
+
+  /* Проверка своей идеи */
+  .check { margin: 36px 0 0; padding: 24px 22px; background: var(--surface); border: 2px solid var(--ink); border-radius: 6px; }
+  .check p { margin: 0 0 14px; max-width: 62ch; }
+  .check label { display: block; font-weight: 600; margin: 0 0 6px; }
+  .check textarea {
+    width: 100%;
+    min-height: 110px;
+    padding: 12px;
+    font: 400 1rem/1.5 var(--font-body);
+    color: var(--ink);
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 6px;
+    resize: vertical;
+  }
+  .btn {
+    margin-top: 12px;
+    font: 600 1rem var(--font-body);
+    padding: 0.7rem 1.2rem;
+    background: var(--ink);
+    color: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .btn:hover { background: var(--marker); color: #16213E; }
+  .status { margin: 10px 0 0; min-height: 1.5em; color: var(--muted); font-size: 0.92rem; }
+
+  footer { margin: 40px 0 0; padding: 20px 0 48px; border-top: 1px dashed var(--line); color: var(--muted); font-size: 0.88rem; }
+  footer p { margin: 0 0 8px; max-width: 70ch; }
+
+  noscript p { padding: 16px; background: var(--marker); color: #16213E; }
+
+  @media (max-width: 560px) {
+    .idea summary { grid-template-columns: 1fr; }
+    .scores { grid-column: 1; grid-row: auto; }
+    .toggle { order: 5; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .verdict { transform: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <span class="brand">Разбор</span>
+    <p>Бизнес-идеи, которые проверил ИИ</p>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="hero-title">
+      <h1 id="hero-title">Выбери тему и сразу получи разборы</h1>
+      <p class="lead">Каждую идею разбираем по одной схеме: кому нужна, как зарабатывает, где риски и что сделать за первые дни. Оценки — мнение, а не факт.</p>
+
+      <p class="picker-label" id="picker-label">Меня интересует:</p>
+      <div class="chips" id="chips" role="group" aria-labelledby="picker-label"></div>
+    </section>
+
+    <noscript><p>Для работы сайта нужен JavaScript.</p></noscript>
+
+    <section class="topic" id="topic" aria-live="polite">
+      <h2 id="topic-title"></h2>
+      <p class="topic-intro" id="topic-intro"></p>
+      <p class="legend">Оценки от 1 до 5. Спрос: сколько людей ищут решение. Старт: насколько легко начать без денег. Место: чем выше, тем меньше конкурентов.</p>
+      <div id="ideas"></div>
+    </section>
+
+    <section class="books-block" aria-labelledby="books-title">
+      <h2 id="books-title">Что почитать по теме</h2>
+      <ul class="books" id="books"></ul>
+    </section>
+
+    <section class="check" aria-labelledby="check-title">
+      <h2 id="check-title">Проверь свою идею</h2>
+      <p>Опиши идею в двух-трёх предложениях. Мы соберём готовый запрос: вставь его в Алису или Yandex GPT и получи такой же разбор по схеме сайта.</p>
+      <label for="my-idea">Твоя идея</label>
+      <textarea id="my-idea" placeholder="Например: бот, который помогает школьникам копить на первую покупку"></textarea>
+      <button class="btn" id="copy-btn" type="button">Скопировать запрос</button>
+      <p class="status" id="copy-status" role="status"></p>
+    </section>
+  </main>
+
+  <footer>
+    <p>Оценки и вердикты в разборах — мнение автора и ИИ, а не факты и не финансовая или юридическая консультация. Цифры и правила проверяй по официальным источникам.</p>
+    <p>Книги указаны для знакомства с темой. Русские издания ищи по автору.</p>
+  </footer>
+</div>
+
+<script src="content.js"></script>
+<script>
+(function () {
+  var topics = (window.SITE && window.SITE.topics) || [];
+  var chipsEl = document.getElementById("chips");
+  var currentId = null;
+
+  var SCORE_LABELS = [["demand", "Спрос"], ["ease", "Старт"], ["space", "Место"]];
+
+  function el(tag, props, children) {
+    var node = document.createElement(tag);
+    if (props) {
+      Object.keys(props).forEach(function (key) {
+        if (key === "class") node.className = props[key];
+        else if (key === "text") node.textContent = props[key];
+        else node.setAttribute(key, props[key]);
+      });
+    }
+    (children || []).forEach(function (child) { if (child) node.appendChild(child); });
+    return node;
+  }
+
+  function findTopic(id) {
+    for (var i = 0; i < topics.length; i++) if (topics[i].id === id) return topics[i];
+    return null;
+  }
+
+  function dots(value, label) {
+    var wrap = el("dd", { role: "img", "aria-label": label + ": " + value + " из 5" });
+    for (var i = 1; i <= 5; i++) wrap.appendChild(el("span", { class: "dot" + (i <= value ? " on" : "") }));
+    return wrap;
+  }
+
+  function renderIdea(idea, open) {
+    var scores = el("dl", { class: "scores" });
+    SCORE_LABELS.forEach(function (pair) {
+      var row = el("div", { class: "score" }, [
+        el("dt", { text: pair[1] }),
+        dots(idea.scores[pair[0]], pair[1])
+      ]);
+      scores.appendChild(row);
+    });
+
+    var summary = el("summary", null, [
+      el("h3", { text: idea.title }),
+      scores,
+      el("p", { class: "verdict", text: idea.verdict }),
+      el("span", { class: "toggle" }, [
+        el("span", { class: "t-open", text: "Открыть разбор" }),
+        el("span", { class: "t-close", text: "Свернуть разбор" })
+      ])
+    ]);
+
+    var steps = el("ol", { class: "steps" });
+    idea.steps.forEach(function (s) { steps.appendChild(el("li", { text: s })); });
+
+    var body = el("div", { class: "idea-body" }, [
+      el("div", null, [el("h4", { text: "Что это" }), el("p", { text: idea.what })]),
+      el("div", null, [el("h4", { text: "Как зарабатывает" }), el("p", { text: idea.money })]),
+      el("div", { class: "risk" }, [el("h4", { text: "Риски" }), el("p", { text: idea.risks })]),
+      el("div", null, [el("h4", { text: "Первые шаги" }), steps])
+    ]);
+
+    var details = el("details", { class: "idea" }, [summary, body]);
+    if (open) details.setAttribute("open", "");
+    return details;
+  }
+
+  function renderBooks(list) {
+    var ul = document.getElementById("books");
+    ul.textContent = "";
+    list.forEach(function (b) {
+      ul.appendChild(el("li", null, [
+        el("span", { class: "book-title", text: b.title }),
+        el("span", { class: "book-author", text: " — " + b.author }),
+        el("p", { class: "book-note", text: b.note })
+      ]));
+    });
+  }
+
+  function renderTopic(id, fromHash) {
+    var topic = findTopic(id) || topics[0];
+    if (!topic) return;
+    currentId = topic.id;
+
+    Array.prototype.forEach.call(chipsEl.children, function (btn) {
+      btn.setAttribute("aria-pressed", btn.getAttribute("data-id") === topic.id ? "true" : "false");
+    });
+
+    document.getElementById("topic-title").textContent = topic.name;
+    document.getElementById("topic-intro").textContent = topic.intro;
+
+    var ideasEl = document.getElementById("ideas");
+    ideasEl.textContent = "";
+    topic.ideas.forEach(function (idea, i) { ideasEl.appendChild(renderIdea(idea, i === 0)); });
+
+    renderBooks(topic.books);
+
+    if (!fromHash && history.replaceState) history.replaceState(null, "", "#" + topic.id);
+    try { localStorage.setItem("topic", topic.id); } catch (e) { /* хранилище недоступно, это нормально */ }
+  }
+
+  topics.forEach(function (t) {
+    var btn = el("button", { class: "chip", type: "button", "data-id": t.id, "aria-pressed": "false", text: t.name });
+    btn.addEventListener("click", function () { renderTopic(t.id, false); });
+    chipsEl.appendChild(btn);
+  });
+
+  function startId() {
+    var fromHash = location.hash.replace("#", "");
+    if (findTopic(fromHash)) return fromHash;
+    try {
+      var saved = localStorage.getItem("topic");
+      if (findTopic(saved)) return saved;
+    } catch (e) { /* игнорируем */ }
+    return topics.length ? topics[0].id : null;
+  }
+
+  window.addEventListener("hashchange", function () {
+    var id = location.hash.replace("#", "");
+    if (findTopic(id) && id !== currentId) renderTopic(id, true);
+  });
+
+  var start = startId();
+  if (start) renderTopic(start, true);
+
+  /* Проверка своей идеи: собираем запрос для нейросети */
+  var statusEl = document.getElementById("copy-status");
+
+  function buildPrompt(idea) {
+    var topic = findTopic(currentId);
+    return [
+      "Ты аналитик стартапов. Разбери мою бизнес-идею честно, без комплиментов и выдуманных цифр.",
+      "",
+      "Тема: " + (topic ? topic.name : "не указана"),
+      "Идея: " + idea,
+      "",
+      "Ответь по пунктам:",
+      "1. Для кого это и какая у них боль.",
+      "2. Как это может зарабатывать.",
+      "3. Кто уже делает похожее. Называй только реальные сервисы, а если не уверен, так и напиши.",
+      "4. Главные риски.",
+      "5. Пять первых шагов, которые можно сделать без денег.",
+      "6. Оценка от 1 до 5: спрос, лёгкость старта, свободное место на рынке.",
+      "",
+      "Любые цифры помечай как оценку, а не как факт. Если данных не хватает, скажи, что именно нужно проверить."
+    ].join("\n");
+  }
+
+  function fallbackCopy(text) {
+    var ta = document.createElement("textarea");
+    ta.value = text;
+    ta.setAttribute("readonly", "");
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    var ok = false;
+    try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+    document.body.removeChild(ta);
+    return ok;
+  }
+
+  document.getElementById("copy-btn").addEventListener("click", function () {
+    var idea = document.getElementById("my-idea").value.trim();
+    if (!idea) {
+      statusEl.textContent = "Сначала опиши идею в двух-трёх предложениях.";
+      return;
+    }
+    var text = buildPrompt(idea);
+    function done(ok) {
+      statusEl.textContent = ok
+        ? "Скопировано. Вставь запрос в чат с нейросетью."
+        : "Не удалось скопировать автоматически. Выдели текст идеи и вставь свой запрос вручную.";
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () { done(true); }, function () { done(fallbackCopy(text)); });
+    } else {
+      done(fallbackCopy(text));
+    }
+  });
+})();
+</script>
+</body>
+</html>
