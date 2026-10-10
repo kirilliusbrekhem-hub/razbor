@@ -6,6 +6,11 @@
 <title>razbor — Idea starts here.</title>
 <meta name="description" content="Расскажи, что умеешь, и получи готовую бизнес-идею с разбором. Или отправь свою идею и узнай, где риски и что делать первым. Плюс книги, подкасты и материалы по теме.">
 <meta name="color-scheme" content="light dark">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#F6F8FC">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Golos+Text:wght@400;500;600&family=Unbounded:wght@500;700&display=swap" rel="stylesheet">
@@ -60,8 +65,35 @@
 
   /* Шапка */
   .top { padding: 22px 0 0; display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
-  .brand { font: 700 1.25rem var(--font-display); letter-spacing: -0.02em; }
-  .slogan { font: 600 1.45rem/1 var(--font-hand); color: var(--pen); transform: rotate(-1.5deg); display: inline-block; }
+  .logo-link { display: inline-block; line-height: 0; border-radius: 6px; }
+  .logo { display: block; height: 56px; width: auto; }
+  @media (prefers-color-scheme: dark) {
+    .logo-link { background: #F6F8FC; padding: 4px 10px; }
+  }
+
+  /* Бейдж «made with razbor.» */
+  .made-row { display: flex; justify-content: flex-end; margin: 22px 0 0; }
+  .idea-body .made-row { margin: 8px 0 0; }
+  .made {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 16px 6px 8px;
+    background: var(--marker);
+    color: #16213E;
+    border: 2px solid #16213E;
+    border-radius: 999px;
+    box-shadow: 3px 3px 0 #16213E;
+    text-decoration: none;
+    transform: rotate(-1.2deg);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .made:hover, .made:focus-visible { transform: rotate(0deg) translateY(-1px); box-shadow: 4px 4px 0 #16213E; }
+  .made img { display: block; width: 30px; height: 30px; object-fit: contain; background: #F6F8FC; border-radius: 50%; padding: 3px; }
+  .made-text { display: flex; flex-direction: column; line-height: 1.15; }
+  .made-main { font: 500 0.95rem var(--font-body); }
+  .made-main strong { font: 700 1.02rem var(--font-display); letter-spacing: -0.01em; }
+  .made-url { font: 500 0.74rem var(--font-body); opacity: 0.8; }
 
   .lang { margin-left: auto; display: flex; gap: 6px; }
   .lang button {
@@ -80,7 +112,7 @@
   .hero { padding: 40px 0 22px; }
   h1 {
     margin: 0 0 14px;
-    font: 700 clamp(2rem, 6.4vw, 3.5rem)/1.08 var(--font-display);
+    font: 700 clamp(1.7rem, 5vw, 2.8rem)/1.12 var(--font-display);
     letter-spacing: -0.02em;
   }
   .lead { margin: 0; max-width: 60ch; color: var(--muted); }
@@ -229,15 +261,14 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .verdict, .slogan { transform: none; }
+    .verdict, .made { transform: none; transition: none; }
   }
 </style>
 </head>
 <body>
 <div class="wrap">
   <header class="top">
-    <span class="brand">razbor</span>
-    <span class="slogan">Idea starts here.</span>
+    <a class="logo-link" href="/"><img class="logo" src="logo.png" width="624" height="207" alt="razbor — Idea starts here."></a>
     <div class="lang" role="group" aria-label="Language / Язык">
       <button type="button" data-lang="ru" aria-pressed="true">RU</button>
       <button type="button" data-lang="en" aria-pressed="false">EN</button>
@@ -246,7 +277,7 @@
 
   <main>
     <section class="hero" aria-labelledby="hero-title">
-      <h1 id="hero-title">Idea starts here.</h1>
+      <h1 id="hero-title" data-i18n="heroTitle"></h1>
       <p class="lead" data-i18n="lead"></p>
     </section>
 
@@ -303,6 +334,7 @@
   var T = {
     ru: {
       docTitle: "razbor — Idea starts here.",
+      heroTitle: "Придумай бизнес-идею и проверь, сработает ли она",
       lead: "Расскажи, что умеешь и любишь, и агент придумает идею с разбором. Или отправь свою идею: он честно покажет, где риски и что сделать первым. Всё пишется простым языком.",
       agentTitle: "Агент razbor",
       modesAria: "Что сделать",
@@ -346,11 +378,12 @@
       openIdea: "Открыть разбор", closeIdea: "Свернуть разбор",
       forWhom: "Для кого: ", pain: "Боль: ", how: "Как работает: ", earn: "Как зарабатывает: ",
       similar: "Похожие решения: ", riskHead: "Риски:", improveHead: "Как сделать сильнее: ", stepsHead: "Первые шаги:",
-      scoreLine: "Оценка (мнение ИИ): ", verdictLine: "Вердикт: ",
+      scoreLine: "Оценка (мнение ИИ): ", verdictLine: "Вердикт: ", madeAria: "Сделано в razbor, открыть сайт",
       demandWord: "спрос", easeWord: "старт", spaceWord: "место"
     },
     en: {
       docTitle: "razbor — Idea starts here.",
+      heroTitle: "Come up with a business idea and check if it can work",
       lead: "Tell us what you can do and love, and the agent will come up with an idea and review it. Or send your own idea: it will honestly show the risks and what to do first. Everything is written in plain language.",
       agentTitle: "The razbor agent",
       modesAria: "What to do",
@@ -394,7 +427,7 @@
       openIdea: "Open the review", closeIdea: "Collapse the review",
       forWhom: "Who it is for: ", pain: "Pain: ", how: "How it works: ", earn: "How it earns: ",
       similar: "Similar solutions: ", riskHead: "Risks:", improveHead: "How to make it stronger: ", stepsHead: "First steps:",
-      scoreLine: "Score (AI opinion): ", verdictLine: "Verdict: ",
+      scoreLine: "Score (AI opinion): ", verdictLine: "Verdict: ", madeAria: "Made with razbor, open the site",
       demandWord: "demand", easeWord: "start", spaceWord: "room"
     }
   };
@@ -533,6 +566,23 @@
 
   /* ---------- Результат агента ---------- */
 
+  function siteUrl() {
+    return /^https?:$/.test(location.protocol) ? location.origin : "";
+  }
+
+  function madeBadge() {
+    var url = siteUrl();
+    var host = url ? url.replace(/^https?:\/\//, "") : "razbor";
+    var link = el("a", { class: "made", href: url ? url + "/" : "#", target: "_blank", rel: "noopener", "aria-label": t("madeAria") }, [
+      el("img", { src: "mark.png", alt: "", width: "30", height: "30" }),
+      el("span", { class: "made-text" }, [
+        el("span", { class: "made-main" }, [document.createTextNode("made with "), el("strong", { text: "razbor." })]),
+        el("span", { class: "made-url", text: host })
+      ])
+    ]);
+    return el("div", { class: "made-row" }, [link]);
+  }
+
   function section(title, content) {
     return el("div", null, [el("h3", { text: title }), content]);
   }
@@ -544,7 +594,7 @@
     lines.push("", t("improveHead") + res.improve, "", t("stepsHead"));
     res.steps.forEach(function (s, i) { lines.push((i + 1) + ". " + s); });
     lines.push("", t("scoreLine") + t("demandWord") + " " + res.scores.demand + "/5, " + t("easeWord") + " " + res.scores.ease + "/5, " + t("spaceWord") + " " + res.scores.space + "/5",
-      t("verdictLine") + res.verdict, "", "razbor. Idea starts here.");
+      t("verdictLine") + res.verdict, "", "made with razbor." + (siteUrl() ? " " + siteUrl() + "/" : ""));
     return lines.join("\n");
   }
 
@@ -609,7 +659,8 @@
         section(t("sImprove"), el("p", { text: res.improve })),
         section(t("sSteps"), steps)
       ]),
-      actions
+      actions,
+      madeBadge()
     ]);
     box.appendChild(card);
 
@@ -724,7 +775,8 @@
       el("div", null, [el("h4", { text: t("what") }), el("p", { text: idea.what })]),
       el("div", null, [el("h4", { text: t("money") }), el("p", { text: idea.money })]),
       el("div", { class: "risk" }, [el("h4", { text: t("risks") }), el("p", { text: idea.risks })]),
-      el("div", null, [el("h4", { text: t("steps") }), steps])
+      el("div", null, [el("h4", { text: t("steps") }), steps]),
+      madeBadge()
     ]);
     var d = el("details", { class: "idea" }, [summary, body]);
     if (open) d.setAttribute("open", "");
