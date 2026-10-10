@@ -7,6 +7,6 @@
     "node": ">=18"
   },
   "scripts": {
-    "test": "node --test tests/logic.test.js tests/api.test.js"
+    "test": "node --test tests/logic.test.js tests/api.test.js tests/page.test.js"
   }
 }

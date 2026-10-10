@@ -368,6 +368,14 @@
 
   .help { margin: 4px 0 8px; }
   pre.draft { white-space: pre-wrap; word-break: break-word; font: 400 0.95rem/1.5 var(--font-body); background: var(--paper); border: 1px dashed var(--muted); border-radius: 6px; padding: 10px 12px; margin: 6px 0; max-width: 66ch; }
+  .simchart { width: 100%; max-width: 620px; height: auto; display: block; margin: 6px 0 10px; }
+  .simchart .zero { stroke: var(--muted); stroke-dasharray: 4 4; }
+  .simchart .line { stroke: var(--pen); stroke-width: 3; stroke-linejoin: round; }
+  .simchart .tick { fill: var(--muted); font: 500 11px var(--font-body); }
+  .tablewrap { overflow-x: auto; }
+  .simtable { border-collapse: collapse; font-size: 0.85rem; min-width: 460px; }
+  .simtable th, .simtable td { padding: 4px 8px; border-bottom: 1px dashed var(--line); text-align: right; }
+  .simtable th:first-child, .simtable td:first-child { text-align: left; }
   details.fold { margin: 10px 0 0; border-top: 1px dashed var(--line); padding-top: 8px; }
   details.fold > summary { cursor: pointer; font: 600 0.9rem var(--font-body); color: var(--muted); }
   details.fold[open] > summary { margin-bottom: 6px; }

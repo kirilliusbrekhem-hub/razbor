@@ -21,7 +21,7 @@
       back: "← Все проекты", exportBtn: "Скачать данные", updated: "Обновлён: ", exps: "экспериментов: ",
       createProject: "Создать проект и запустить Reality Check",
       created: "Проект создан. Идёт Reality Check…",
-      tabs: { overview: "Обзор", risks: "Риски", experiments: "Эксперимент", evidence: "Гипотезы", share: "Поделиться" },
+      tabs: { overview: "Обзор", risks: "Риски", experiments: "Эксперимент", sim: "Симулятор", evidence: "Гипотезы", share: "Поделиться" },
       tabsAria: "Разделы проекта",
       realityRun: "Запустить Reality Check", realityRetry: "Повторить Reality Check",
       realityWait: "Ищу самые опасные допущения и придумываю эксперимент. Обычно это до минуты.",
@@ -54,6 +54,34 @@
       conf: { high: "высокая", medium: "средняя", low: "низкая" },
       expNone: "Экспериментов пока нет.", expCurrent: "Текущий эксперимент", expDone: "Завершённые эксперименты",
       expStart: "Начать эксперимент", expPlanned: "Запланирован", expActive: "Идёт", expFinished: "Завершён",
+      pageTitle: "Страница-проверка спроса",
+      pageIntro: "Сайт опубликует мини-страницу твоей идеи и сам посчитает уникальных посетителей и нажатия «Мне это нужно» и «Заплатил бы за это». Оплаты и сбора контактов нет: это только отметки интереса.",
+      pageConsent: "Я согласен, что название, суть, аудитория и проблема из моей идеи станут публичными на странице",
+      pagePublish: "Опубликовать страницу", pageWait: "Публикую…", pageNeedConsent: "Отметь согласие, чтобы опубликовать.",
+      pageLink: "Ссылка для людей", pageCopy: "Копировать ссылку", pageCopied: "Ссылка скопирована.",
+      pageRefresh: "Обновить цифры", pageDelete: "Удалить страницу", pageDeleteConfirm: "Удалить страницу и все её счётчики?",
+      pageViews: "Уникальных посетителей", pageWants: "«Мне это нужно»", pagePays: "«Заплатил бы»", pageReports: "Жалоб",
+      pageImport: "Записать эти цифры в эксперимент", pageImported: "Цифры записаны в эксперимент как измеренные сайтом.",
+      pageNoExp: "Сначала начни эксперимент, потом можно записать цифры.",
+      pageNote: "Считаются уникальные посетители (по обезличенному отпечатку), но защиты от накрутки нет: если разошлёшь ссылку только друзьям, это сигнал от друзей, а не от рынка. «Заплатил бы» это не оплата.",
+      pageLoaded: "Данные обновлены.",
+      m_wants: "Нажатий «Мне это нужно» (страница)", m_wouldpay: "Нажатий «Заплатил бы» (страница)",
+      simTitle: "Симулятор бизнеса",
+      simIntro: "Простая арифметика по твоим допущениям: сколько можно заработать за 12 месяцев, когда бизнес выходит в ноль и сколько денег нужно на старте. Это не прогноз: все числа вводишь ты, ИИ их не придумывает.",
+      simModel: "Модель дохода", simSub: "Подписка (платят каждый месяц)", simOne: "Разовые продажи",
+      simScen: "Сценарий", simPess: "Пессимистичный", simBase: "Базовый", simOpt: "Оптимистичный",
+      simScenNote: "Пессимистичный: посетителей на 30% меньше и конверсия вдвое ниже. Оптимистичный: посетителей на 30% больше и конверсия в 1,5 раза выше.",
+      sim: { price: "Цена одного платежа", visitors: "Посетителей в месяц", conv: "Из них становятся платящими, %", churn: "Уходят каждый месяц, % (подписка)", growth: "Рост посетителей в месяц, %", fixed: "Постоянные расходы в месяц", marketing: "Реклама в месяц", varCost: "Расход на одного клиента", startup: "Затраты на старт (один раз)" },
+      simFromPage: "Подставить конверсию со страницы", simFromPageNote: "Подставлена доля нажавших «Заплатил бы». Это намерение, а не оплата, реальная конверсия обычно ниже.",
+      simRes: "Результат за 12 месяцев", simRev: "Выручка", simProfit: "Прибыль", simBreak: "Выход в ноль с учётом старта", simCash: "Нужно денег на старте и первые месяцы",
+      simNever: "не выходит за 12 месяцев", simMonth: "месяц ", simNeed: "Чтобы покрыть расходы, нужно платящих клиентов в месяц: ",
+      simNeedConv: "Для этого нужна конверсия посетителей примерно ",
+      simInsightLoss: "При этих допущениях бизнес не выходит в ноль за год. Что изменить: цену, расходы или число посетителей, и проверь это экспериментом.",
+      simInsightOk: "При этих допущениях бизнес выходит в ноль. Главное: проверь, что конверсия и цена реальны, а не придуманы.",
+      simChart: "Накопленная прибыль по месяцам (ниже нуля это убыток)", simTable: "Таблица по месяцам",
+      simCols: ["Мес.", "Клиентов", "Выручка", "Расходы", "Прибыль", "Итого"],
+      simZero: "Введи цену и число посетителей, чтобы увидеть результат.",
+      simDisclaimer: "Это симуляция по допущениям, а не прогноз и не финансовая консультация.",
       helpBtn: "Помоги с этим шагом", helpWait: "Готовлю текст…", helpAgain: "Сделать заново", helpCopy: "Копировать", helpTitle: "Помощь ИИ",
       helpNote: "Это черновик. Проверь его и скорректируй. Результаты эксперимента ИИ не проводит и не подставляет: их собираешь ты.",
       expDetails: "Метрики, критерии и что делать дальше",
@@ -66,7 +94,7 @@
       linksT: "Ссылки на свидетельства", linkPh: "https://...", linkAdd: "Добавить ссылку", linkBad: "Нужна ссылка, которая начинается с http:// или https://",
       resultsT: "Результаты",
       resultsHint: "Просмотры и лайки это внимание, а не готовность платить. Заявки и оплаты весят больше всего.",
-      m: { views: "Просмотры (внимание)", conversations: "Разговоры и ответы", positive: "Из них «да, это нужно»", negative: "Из них «нет»", leads: "Заявки (оставили контакт)", paid: "Реальные оплаты или предоплаты", spend: "Расходы (в твоей валюте)" },
+      m: { wants: "Нажатий «Мне это нужно» (страница)", wouldpay: "Нажатий «Заплатил бы» (страница)", views: "Просмотры (внимание)", conversations: "Разговоры и ответы", positive: "Из них «да, это нужно»", negative: "Из них «нет»", leads: "Заявки (оставили контакт)", paid: "Реальные оплаты или предоплаты", spend: "Расходы (в твоей валюте)" },
       finish: "Завершить эксперимент", finishDone: "Эксперимент завершён и записан в историю.",
       resultTitle: "Итог эксперимента",
       outcomes: { supported: "Гипотеза получила поддержку", rejected: "Гипотеза не получила поддержки", inconclusive: "Данных недостаточно", contradictory: "Результат противоречивый" },
@@ -80,7 +108,9 @@
         negative: "Собеседники отвечали «нет» и никто не оставил заявку.",
         attention: "Есть внимание (просмотры), но нет заявок. Просмотры не доказывают готовность купить.",
         few: "Есть отдельные заявки или оплаты, но разговоров мало. Это может быть случайность или знакомые.",
-        small: "Слишком мало ответов, чтобы делать вывод."
+        small: "Слишком мало ответов, чтобы делать вывод.",
+        pageintent: "Заметная доля посетителей страницы нажала «Заплатил бы». Это слабое намерение: оплат пока нет.",
+        pagezero: "Страницу посмотрели, но никто не нажал кнопки. Проблема может быть в тексте страницы, а не в самой идее."
       },
       supportedNote: "SUPPORTED не значит «доказано»: поддержка могла быть случайной или зависеть от аудитории. Её нужно повторить.",
       evTitle: "Доска гипотез",
@@ -91,7 +121,7 @@
       hAdd: "Записать",
       hNew: "Добавить гипотезу", hNewPh: "Например: люди готовы платить за это больше 500 в месяц", hNewBtn: "Добавить",
       histTitle: "История прогресса", histNone: "История пока пуста.",
-      h: { created: "Проект создан", reality: "Reality Check готов", expStart: "Эксперимент начат: ", expDone: "Эксперимент завершён: ", status: "Статус гипотезы изменён: ", move: "Решение по шагу: ", hyp: "Добавлена гипотеза: ", evidence: "Добавлено свидетельство" },
+      h: { page: "Опубликована страница-проверка", created: "Проект создан", reality: "Reality Check готов", expStart: "Эксперимент начат: ", expDone: "Эксперимент завершён: ", status: "Статус гипотезы изменён: ", move: "Решение по шагу: ", hyp: "Добавлена гипотеза: ", evidence: "Добавлено свидетельство" },
       moveTitle: "Следующий шаг",
       moveNone: "Следующий шаг появится после первого завершённого эксперимента: рекомендация опирается на твои реальные результаты.",
       moveBasis: "На чём основано: ", moveTime: "Время: ", moveMoney: "Деньги: ", moveUseful: "Полезный результат: ",
@@ -130,7 +160,7 @@
       back: "← All projects", exportBtn: "Download data", updated: "Updated: ", exps: "experiments: ",
       createProject: "Create a project and run Reality Check",
       created: "Project created. Running Reality Check…",
-      tabs: { overview: "Overview", risks: "Risks", experiments: "Experiment", evidence: "Hypotheses", share: "Share" },
+      tabs: { overview: "Overview", risks: "Risks", experiments: "Experiment", sim: "Simulator", evidence: "Hypotheses", share: "Share" },
       tabsAria: "Project sections",
       realityRun: "Run Reality Check", realityRetry: "Retry Reality Check",
       realityWait: "Finding the most dangerous assumptions and designing an experiment. This usually takes up to a minute.",
@@ -163,6 +193,34 @@
       conf: { high: "high", medium: "medium", low: "low" },
       expNone: "No experiments yet.", expCurrent: "Current experiment", expDone: "Completed experiments",
       expStart: "Start the experiment", expPlanned: "Planned", expActive: "In progress", expFinished: "Completed",
+      pageTitle: "Demand test page",
+      pageIntro: "The site publishes a mini page for your idea and counts unique visitors and clicks on \"I need this\" and \"I would pay for this\". There is no payment or contact collection: these are only interest marks.",
+      pageConsent: "I agree that the title, essence, audience and problem from my idea become public on the page",
+      pagePublish: "Publish the page", pageWait: "Publishing…", pageNeedConsent: "Tick the consent box to publish.",
+      pageLink: "Link for people", pageCopy: "Copy the link", pageCopied: "Link copied.",
+      pageRefresh: "Refresh numbers", pageDelete: "Delete the page", pageDeleteConfirm: "Delete the page and all its counters?",
+      pageViews: "Unique visitors", pageWants: "\"I need this\"", pagePays: "\"I would pay\"", pageReports: "Reports",
+      pageImport: "Write these numbers into the experiment", pageImported: "The numbers were recorded in the experiment as measured by the site.",
+      pageNoExp: "Start an experiment first, then you can record the numbers.",
+      pageNote: "Unique visitors are counted by an anonymised fingerprint, but there is no fraud protection: if you send the link only to friends, it is a signal from friends, not from the market. \"I would pay\" is not a payment.",
+      pageLoaded: "Data updated.",
+      m_wants: "Clicks on \"I need this\" (page)", m_wouldpay: "Clicks on \"I would pay\" (page)",
+      simTitle: "Business simulator",
+      simIntro: "Simple arithmetic over your assumptions: how much you could earn in 12 months, when the business breaks even and how much money you need to start. It is not a forecast: you enter all the numbers, the AI does not invent them.",
+      simModel: "Revenue model", simSub: "Subscription (paid monthly)", simOne: "One-time sales",
+      simScen: "Scenario", simPess: "Pessimistic", simBase: "Base", simOpt: "Optimistic",
+      simScenNote: "Pessimistic: 30% fewer visitors and half the conversion. Optimistic: 30% more visitors and 1.5 times the conversion.",
+      sim: { price: "Price of one payment", visitors: "Visitors per month", conv: "Of them become paying, %", churn: "Leave each month, % (subscription)", growth: "Visitor growth per month, %", fixed: "Fixed costs per month", marketing: "Advertising per month", varCost: "Cost per customer", startup: "Start-up costs (one-off)" },
+      simFromPage: "Use the conversion from the page", simFromPageNote: "The share who clicked \"I would pay\" was used. It is intent, not payment, real conversion is usually lower.",
+      simRes: "Result over 12 months", simRev: "Revenue", simProfit: "Profit", simBreak: "Break-even including start-up", simCash: "Money needed at the start and in the first months",
+      simNever: "not within 12 months", simMonth: "month ", simNeed: "To cover costs you need paying customers per month: ",
+      simNeedConv: "That needs a visitor conversion of about ",
+      simInsightLoss: "With these assumptions the business does not break even within a year. What to change: price, costs or visitors, and test it with an experiment.",
+      simInsightOk: "With these assumptions the business breaks even. The key: check that conversion and price are real, not invented.",
+      simChart: "Cumulative profit by month (below zero is a loss)", simTable: "Table by month",
+      simCols: ["Mo.", "Customers", "Revenue", "Costs", "Profit", "Total"],
+      simZero: "Enter a price and visitors to see the result.",
+      simDisclaimer: "This is a simulation over assumptions, not a forecast and not financial advice.",
       helpBtn: "Help with this step", helpWait: "Preparing the text…", helpAgain: "Redo", helpCopy: "Copy", helpTitle: "AI help",
       helpNote: "This is a draft. Check and adjust it. The AI does not run the experiment or fill in results: you gather them.",
       expDetails: "Metrics, criteria and what to do next",
@@ -175,7 +233,7 @@
       linksT: "Links to evidence", linkPh: "https://...", linkAdd: "Add link", linkBad: "Enter a link that starts with http:// or https://",
       resultsT: "Results",
       resultsHint: "Views and likes are attention, not willingness to pay. Sign-ups and payments weigh the most.",
-      m: { views: "Views (attention)", conversations: "Conversations and replies", positive: "Of them, \"yes, I need this\"", negative: "Of them, \"no\"", leads: "Sign-ups (left a contact)", paid: "Real payments or prepayments", spend: "Spent (in your currency)" },
+      m: { wants: "Clicks on \"I need this\" (page)", wouldpay: "Clicks on \"I would pay\" (page)", views: "Views (attention)", conversations: "Conversations and replies", positive: "Of them, \"yes, I need this\"", negative: "Of them, \"no\"", leads: "Sign-ups (left a contact)", paid: "Real payments or prepayments", spend: "Spent (in your currency)" },
       finish: "Complete the experiment", finishDone: "The experiment is complete and recorded in the history.",
       resultTitle: "Experiment outcome",
       outcomes: { supported: "The hypothesis got support", rejected: "The hypothesis got no support", inconclusive: "Not enough data", contradictory: "The result is contradictory" },
@@ -189,7 +247,9 @@
         negative: "Interviewees answered \"no\" and nobody signed up.",
         attention: "There is attention (views) but no sign-ups. Views do not prove willingness to buy.",
         few: "There are a few sign-ups or payments but few conversations. It could be chance or friends.",
-        small: "Too few answers to draw a conclusion."
+        small: "Too few answers to draw a conclusion.",
+        pageintent: "A noticeable share of page visitors clicked \"I would pay\". It is weak intent: there are no payments yet.",
+        pagezero: "The page was viewed but nobody clicked the buttons. The problem may be the page text, not the idea itself."
       },
       supportedNote: "SUPPORTED does not mean \"proven\": the support could be chance or depend on the audience. It needs to be repeated.",
       evTitle: "Evidence board",
@@ -200,7 +260,7 @@
       hAdd: "Record",
       hNew: "Add a hypothesis", hNewPh: "For example: people would pay more than 10 a month for this", hNewBtn: "Add",
       histTitle: "Progress history", histNone: "The history is empty.",
-      h: { created: "Project created", reality: "Reality Check ready", expStart: "Experiment started: ", expDone: "Experiment completed: ", status: "Hypothesis status changed: ", move: "Decision on a step: ", hyp: "Hypothesis added: ", evidence: "Evidence added" },
+      h: { page: "Demand test page published", created: "Project created", reality: "Reality Check ready", expStart: "Experiment started: ", expDone: "Experiment completed: ", status: "Hypothesis status changed: ", move: "Decision on a step: ", hyp: "Hypothesis added: ", evidence: "Evidence added" },
       moveTitle: "Next move",
       moveNone: "The next move appears after the first completed experiment: the recommendation is based on your real results.",
       moveBasis: "Based on: ", moveTime: "Time: ", moveMoney: "Money: ", moveUseful: "Useful result: ",
@@ -273,6 +333,8 @@
       if (["high", "medium", "low"].indexOf(h.importance) === -1) h.importance = "medium";
       h.evidence = arr(h.evidence);
     });
+    x.page = x.page && typeof x.page.id === "string" && typeof x.page.token === "string" ? x.page : null;
+    x.sim = x.sim && typeof x.sim === "object" ? x.sim : null;
     x.history = arr(x.history);
     x.decisions = arr(x.decisions);
     return x;
@@ -655,14 +717,21 @@
     card.appendChild(el("h4", { text: p("resultsT") }));
     card.appendChild(el("p", { class: "muted", text: p("resultsHint") }));
     var grid = el("div", { class: "mgrid" });
-    ["views", "conversations", "positive", "negative", "leads", "paid", "spend"].forEach(function (k) {
+    ["views", "wants", "wouldpay", "conversations", "positive", "negative", "leads", "paid", "spend"].forEach(function (k) {
       var inp = el("input", { type: "number", min: "0", step: "1", inputmode: "numeric" });
       inp.value = e.metrics[k] ? String(e.metrics[k]) : "";
       if (done) inp.disabled = true;
-      inp.addEventListener("change", function () { e.metrics = L.cleanMetrics(Object.assign({}, e.metrics, (function () { var o = {}; o[k] = inp.value; return o; })())); inp.value = e.metrics[k] ? String(e.metrics[k]) : ""; touch(pr); });
+      inp.addEventListener("change", function () {
+        var o = {}; o[k] = inp.value;
+        if (k === "views" || k === "wants" || k === "wouldpay") o.measured = false;
+        e.metrics = L.cleanMetrics(Object.assign({}, e.metrics, o));
+        inp.value = e.metrics[k] ? String(e.metrics[k]) : "";
+        touch(pr);
+      });
       grid.appendChild(inputRow(p("m")[k], inp));
     });
     card.appendChild(grid);
+    if (e.metrics && e.metrics.measured) card.appendChild(el("p", { class: "muted", text: p("pageImported") }));
     if (done && e.evaluation) card.appendChild(renderOutcome(e.evaluation));
     if (!done) card.appendChild(btn(p("finish"), "", function () { finishExperiment(pr, e); }));
     return card;
@@ -693,8 +762,197 @@
     return det;
   }
 
+  /* Страница-проверка спроса */
+
+  async function pagePost(payload) {
+    try {
+      var response = await fetch("/api/page", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(Object.assign({ lang: A.lang() }, payload)) });
+      var data = null;
+      try { data = await response.json(); } catch (e) { data = null; }
+      if (!response.ok || !data) return { ok: false, error: (data && data.error) || p("realityFailed") };
+      return { ok: true, data: data };
+    } catch (e) { return { ok: false, error: p("realityFailed") }; }
+  }
+
+  function pageCard(pr) {
+    var box = el("div", { class: "pcard" }, [h3(p("pageTitle"))]);
+    var msg = el("p", { class: "muted", role: "status" });
+    if (!pr.page) {
+      box.appendChild(el("p", { text: p("pageIntro") }));
+      var cb = el("input", { type: "checkbox", id: "page-consent-" + pr.id });
+      box.appendChild(el("label", { for: "page-consent-" + pr.id, class: "consent" }, [cb, document.createTextNode(" " + p("pageConsent"))]));
+      var pub = btn(busy["page" + pr.id] ? p("pageWait") : p("pagePublish"), "", async function () {
+        if (!cb.checked) { msg.textContent = p("pageNeedConsent"); return; }
+        busy["page" + pr.id] = true; msg.textContent = p("pageWait"); pub.disabled = true;
+        var r = await pagePost({ action: "create", idea: pr.idea });
+        busy["page" + pr.id] = false;
+        if (r.ok && r.data.id) { pr.page = { id: r.data.id, token: r.data.token, created: now() }; log(pr, "page", ""); touch(pr); render(); }
+        else { msg.className = "err"; msg.textContent = r.error; pub.disabled = false; }
+      });
+      box.appendChild(pub);
+      box.appendChild(msg);
+      return box;
+    }
+    var base = /^https?:$/.test(location.protocol) ? location.origin : "";
+    var url = base + "/p/" + pr.page.id;
+    box.appendChild(el("p", { class: "pr-title", text: p("pageLink") }));
+    box.appendChild(el("p", null, [el("a", { href: url, target: "_blank", rel: "noopener", text: url })]));
+    var stats = el("dl", { class: "meta" });
+    function showStats(st) {
+      stats.textContent = "";
+      [[p("pageViews"), st.views], [p("pageWants"), st.needs], [p("pagePays"), st.pays], [p("pageReports"), st.reports]].forEach(function (r) {
+        stats.appendChild(el("div", null, [el("dt", { text: r[0] }), el("dd", { text: String(r[1]) })]));
+      });
+    }
+    var cur = pr.page.stats;
+    if (cur) showStats(cur);
+    var row = el("div", { class: "result-actions" });
+    row.appendChild(btn(p("pageCopy"), "ghost small", function () { A.copy(url, function () { msg.textContent = p("pageCopied"); }); }));
+    row.appendChild(btn(p("pageRefresh"), "ghost small", async function () {
+      var r = await pagePost({ action: "stats", id: pr.page.id, token: pr.page.token });
+      if (r.ok && r.data.stats) { pr.page.stats = r.data.stats; pr.page.statsAt = now(); touch(pr); render(); }
+      else { msg.className = "err"; msg.textContent = r.error; }
+    }));
+    row.appendChild(btn(p("pageImport"), "ghost small", function () {
+      var st = pr.page.stats;
+      var ex = pr.experiments.filter(function (x) { return x.status === "active"; })[0] || pr.experiments.filter(function (x) { return x.status === "planned"; })[0];
+      if (!st) { msg.textContent = p("pageRefresh"); return; }
+      if (!ex) { msg.textContent = p("pageNoExp"); return; }
+      ex.metrics = L.cleanMetrics(Object.assign({}, ex.metrics, { views: st.views, wants: st.needs, wouldpay: st.pays, measured: true }));
+      log(pr, "evidence", p("pageTitle"));
+      touch(pr); render();
+    }));
+    row.appendChild(btn(p("pageDelete"), "ghost small", async function () {
+      if (!window.confirm(p("pageDeleteConfirm"))) return;
+      var r = await pagePost({ action: "delete", id: pr.page.id, token: pr.page.token });
+      if (r.ok || /не найдена|not found/i.test(r.error || "")) { pr.page = null; touch(pr); render(); }
+      else { msg.className = "err"; msg.textContent = r.error; }
+    }));
+    box.appendChild(stats);
+    box.appendChild(row);
+    box.appendChild(msg);
+    box.appendChild(el("p", { class: "muted", text: p("pageNote") }));
+    return box;
+  }
+
+  /* Симулятор бизнеса */
+
+  var simScenario = "base";
+
+  function fmtNum(n) {
+    if (n === null || !isFinite(n)) return "—";
+    var a = Math.abs(n);
+    return (n < 0 ? "−" : "") + (a >= 100 ? Math.round(a) : Math.round(a * 10) / 10).toLocaleString(A.lang() === "en" ? "en-GB" : "ru-RU");
+  }
+
+  function simChart(rows) {
+    var NS = "http://www.w3.org/2000/svg";
+    var W = 600, H = 200, padL = 10, padR = 10, padT = 14, padB = 22;
+    var vals = rows.map(function (r) { return r.cumulative; });
+    var min = Math.min.apply(null, vals.concat([0])), max = Math.max.apply(null, vals.concat([0]));
+    if (max === min) max = min + 1;
+    function x(i) { return padL + i * (W - padL - padR) / (rows.length - 1); }
+    function y(v) { return padT + (max - v) * (H - padT - padB) / (max - min); }
+    var svg = document.createElementNS(NS, "svg");
+    svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+    svg.setAttribute("class", "simchart");
+    svg.setAttribute("role", "img");
+    svg.setAttribute("aria-label", p("simChart"));
+    function mk(tag, attrs) { var n = document.createElementNS(NS, tag); Object.keys(attrs).forEach(function (k) { n.setAttribute(k, attrs[k]); }); return n; }
+    svg.appendChild(mk("line", { x1: padL, x2: W - padR, y1: y(0), y2: y(0), class: "zero" }));
+    svg.appendChild(mk("polyline", { points: rows.map(function (r, i) { return x(i) + "," + y(r.cumulative); }).join(" "), class: "line", fill: "none" }));
+    rows.forEach(function (r, i) {
+      if (i % 2 === 0 || i === rows.length - 1) {
+        var tx = mk("text", { x: x(i), y: H - 6, "text-anchor": "middle", class: "tick" });
+        tx.textContent = String(r.month);
+        svg.appendChild(tx);
+      }
+    });
+    var last = rows[rows.length - 1];
+    var lab = mk("text", { x: W - padR, y: Math.max(12, y(last.cumulative) - 6), "text-anchor": "end", class: "tick" });
+    lab.textContent = fmtNum(last.cumulative);
+    svg.appendChild(lab);
+    return svg;
+  }
+
+  function tabSim(pr) {
+    pr.sim = pr.sim && typeof pr.sim === "object" ? pr.sim : { model: "subscription" };
+    var sm = pr.sim;
+    var out = el("div");
+    out.appendChild(el("p", { class: "notice", text: p("simIntro") }));
+    if (pr.idea && pr.idea.money) out.appendChild(block(p("money"), pr.idea.money));
+
+    var form = el("div", { class: "pcard" });
+    var sel = el("select", { "aria-label": p("simModel") }, [el("option", { value: "subscription", text: p("simSub") }), el("option", { value: "onetime", text: p("simOne") })]);
+    sel.value = sm.model === "onetime" ? "onetime" : "subscription";
+    sel.addEventListener("change", function () { sm.model = sel.value; touch(pr); render(); });
+    form.appendChild(inputRow(p("simModel"), sel));
+    var grid = el("div", { class: "mgrid" });
+    ["price", "visitors", "conv", "churn", "growth", "fixed", "marketing", "varCost", "startup"].forEach(function (k) {
+      if (k === "churn" && sm.model === "onetime") return;
+      var inp = el("input", { type: "number", step: "any", inputmode: "decimal", min: k === "growth" ? "-50" : "0" });
+      inp.value = sm[k] === undefined || sm[k] === "" ? "" : String(sm[k]);
+      inp.addEventListener("change", function () { sm[k] = inp.value === "" ? "" : Number(inp.value); touch(pr); render(); });
+      grid.appendChild(inputRow(p("sim")[k], inp));
+    });
+    form.appendChild(grid);
+    if (pr.page && pr.page.stats && pr.page.stats.views > 0) {
+      form.appendChild(btn(p("simFromPage"), "ghost small", function () {
+        var st = pr.page.stats;
+        sm.conv = Math.round(st.pays / st.views * 1000) / 10;
+        touch(pr); render();
+      }));
+      form.appendChild(el("p", { class: "muted", text: p("simFromPageNote") }));
+    }
+    out.appendChild(form);
+
+    var tabs = el("div", { class: "gtabs", role: "group", "aria-label": p("simScen") });
+    [["pess", p("simPess")], ["base", p("simBase")], ["opt", p("simOpt")]].forEach(function (s2) {
+      var b = el("button", { type: "button", class: "gtab", "aria-pressed": simScenario === s2[0] ? "true" : "false", text: s2[1] });
+      b.addEventListener("click", function () { simScenario = s2[0]; render(); });
+      tabs.appendChild(b);
+    });
+    out.appendChild(tabs);
+    out.appendChild(el("p", { class: "muted", text: p("simScenNote") }));
+
+    var r = L.simulate(sm, simScenario);
+    if (!(r.params.price > 0 && r.params.visitors > 0)) { out.appendChild(el("div", { class: "empty" }, [el("p", { text: p("simZero") })])); return out; }
+    var res = el("div", { class: "pcard" }, [h3(p("simRes"))]);
+    var meta = el("dl", { class: "meta" });
+    [[p("simRev"), fmtNum(r.revenue12)], [p("simProfit"), fmtNum(r.profit12)],
+      [p("simBreak"), r.breakEvenMonth === null ? p("simNever") : p("simMonth") + r.breakEvenMonth],
+      [p("simCash"), fmtNum(r.cashNeeded)]].forEach(function (x) {
+      meta.appendChild(el("div", null, [el("dt", { text: x[0] }), el("dd", { text: x[1] })]));
+    });
+    res.appendChild(meta);
+    if (r.needCustomers !== null) {
+      var line = p("simNeed") + fmtNum(r.needCustomers);
+      if (r.needConvPct !== null && r.needConvPct < 100000) line += ". " + p("simNeedConv") + fmtNum(r.needConvPct) + "%";
+      res.appendChild(el("p", { text: line }));
+    }
+    res.appendChild(el("p", { class: "pr-title", text: r.breakEvenMonth === null ? p("simInsightLoss") : p("simInsightOk") }));
+    res.appendChild(el("h4", { text: p("simChart") }));
+    res.appendChild(simChart(r.rows));
+    var det = el("details", { class: "fold" }, [el("summary", { text: p("simTable") })]);
+    var tbl = el("table", { class: "simtable" });
+    var thead = el("tr");
+    p("simCols").forEach(function (c) { thead.appendChild(el("th", { text: c })); });
+    tbl.appendChild(thead);
+    r.rows.forEach(function (row) {
+      var tr = el("tr");
+      [row.month, row.customers, row.revenue, row.cost, row.profit, row.cumulative].forEach(function (v, i) { tr.appendChild(el("td", { text: i === 0 ? String(v) : fmtNum(v) })); });
+      tbl.appendChild(tr);
+    });
+    det.appendChild(el("div", { class: "tablewrap" }, [tbl]));
+    res.appendChild(det);
+    res.appendChild(el("p", { class: "muted", text: p("simDisclaimer") }));
+    out.appendChild(res);
+    return out;
+  }
+
   function tabExperiments(pr) {
     var out = el("div");
+    out.appendChild(pageCard(pr));
     if (!pr.reality && !pr.experiments.length) { out.appendChild(realityGate(pr)); out.appendChild(manualExperimentForm(pr)); return out; }
     var open = pr.experiments.filter(function (e) { return e.status !== "done"; });
     var done = pr.experiments.filter(function (e) { return e.status === "done"; });
@@ -1019,8 +1277,8 @@
     body.appendChild(el("div", { class: "result-actions" }, [btn(p("exportBtn"), "ghost", exportData)]));
   }
 
-  var TAB_KEYS = ["overview", "risks", "experiments", "evidence", "share"];
-  var TABS = { overview: tabOverview, risks: tabRisks, experiments: tabExperiments, evidence: tabEvidence, share: shareBlock };
+  var TAB_KEYS = ["overview", "risks", "experiments", "sim", "evidence", "share"];
+  var TABS = { overview: tabOverview, risks: tabRisks, experiments: tabExperiments, sim: tabSim, evidence: tabEvidence, share: shareBlock };
 
   function render() {
     var body = $("workspace-body");

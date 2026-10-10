@@ -24,6 +24,9 @@
       negative: int(m.negative, 100000),
       leads: int(m.leads, 100000),
       paid: int(m.paid, 100000),
+      wants: int(m.wants, 1000000),
+      wouldpay: int(m.wouldpay, 1000000),
+      measured: !!m.measured,
       spend: int(m.spend, 100000000)
     };
   }
@@ -37,7 +40,9 @@
   */
   function evaluate(raw) {
     var m = cleanMetrics(raw);
-    var tier = m.paid > 0 ? 'payment' : m.leads > 0 ? 'intent' : m.conversations > 0 ? 'conversation' : m.views > 0 ? 'attention' : 'none';
+    // Нажатия «Заплатил бы» на странице-проверке считаются намерением, но вдвое слабее заявки с контактом.
+    var lead = m.leads + Math.floor(m.wouldpay / 2);
+    var tier = m.paid > 0 ? 'payment' : lead > 0 ? 'intent' : m.conversations > 0 ? 'conversation' : m.views > 0 ? 'attention' : 'none';
     var reasons = [];
     var outcome = 'inconclusive';
     var strength = 'none';
@@ -54,21 +59,27 @@
       outcome = 'supported';
       strength = m.paid >= 3 ? 'strong' : 'moderate';
       reasons.push('paid');
-    } else if (m.leads >= 3 && m.conversations >= 5 && m.leads / m.conversations >= 0.2) {
+    } else if (lead >= 3 && m.conversations >= 5 && lead / m.conversations >= 0.2) {
       outcome = 'supported';
-      strength = m.leads >= 5 ? 'moderate' : 'weak';
+      strength = lead >= 5 ? 'moderate' : 'weak';
       reasons.push('intent');
-    } else if (m.conversations >= 10 && m.leads === 0 && m.paid === 0) {
+    } else if (m.views >= 30 && m.wouldpay >= 3 && m.wouldpay / m.views >= 0.1 && m.paid === 0) {
+      outcome = 'supported';
+      strength = 'weak';
+      reasons.push('pageintent');
+    } else if (m.measured && m.views >= 50 && m.wants + m.wouldpay === 0 && m.conversations < 5 && m.paid === 0) {
+      reasons.push('pagezero');
+    } else if (m.conversations >= 10 && lead === 0 && m.paid === 0) {
       outcome = 'rejected';
       strength = 'moderate';
       reasons.push('nobody');
-    } else if (m.conversations >= 5 && m.negative >= 3 && m.positive === 0 && m.leads + m.paid === 0) {
+    } else if (m.conversations >= 5 && m.negative >= 3 && m.positive === 0 && lead + m.paid === 0) {
       outcome = 'rejected';
       strength = 'weak';
       reasons.push('negative');
-    } else if (tier === 'attention' || (m.views >= 100 && m.leads + m.paid === 0)) {
+    } else if (tier === 'attention' || (m.views >= 100 && lead + m.paid === 0)) {
       reasons.push('attention');
-    } else if (m.paid >= 1 || m.leads >= 1) {
+    } else if (m.paid >= 1 || lead >= 1) {
       reasons.push('few');
     } else {
       reasons.push('small');
@@ -95,7 +106,7 @@
     var supported = 0, rejected = 0, other = 0;
     done.forEach(function (e) {
       var m = cleanMetrics(e.metrics);
-      tot.views += m.views; tot.conversations += m.conversations; tot.leads += m.leads; tot.paid += m.paid;
+      tot.views += m.views; tot.conversations += m.conversations; tot.leads += m.leads + Math.floor(m.wouldpay / 2); tot.paid += m.paid;
       tot.positive += m.positive; tot.negative += m.negative;
       tot.links += Math.min(((e.links || []).length), 5);
       var o = e.evaluation && e.evaluation.outcome;
@@ -244,7 +255,67 @@
     } catch (e) { return null; }
   }
 
+  /* ---------- Симулятор бизнеса ---------- */
+
+  function num(v, min, max, def) {
+    var n = Number(v);
+    if (!isFinite(n)) return def;
+    return n < min ? min : n > max ? max : n;
+  }
+
+  var SCEN = { pess: { v: 0.7, c: 0.5 }, base: { v: 1, c: 1 }, opt: { v: 1.3, c: 1.5 } };
+
+  /*
+    Простая модель по допущениям пользователя. model: subscription (подписка с оттоком) или onetime (разовые продажи).
+    Ничего не берётся с рынка: это арифметика над введёнными числами, а не прогноз.
+  */
+  function simulate(raw, scenario) {
+    raw = raw || {};
+    var p = {
+      model: raw.model === 'onetime' ? 'onetime' : 'subscription',
+      price: num(raw.price, 0, 1e9, 0),
+      visitors: num(raw.visitors, 0, 1e9, 0),
+      conv: num(raw.conv, 0, 100, 0),
+      churn: num(raw.churn, 0, 100, 0),
+      growth: num(raw.growth, -50, 100, 0),
+      fixed: num(raw.fixed, 0, 1e9, 0),
+      marketing: num(raw.marketing, 0, 1e9, 0),
+      varCost: num(raw.varCost, 0, 1e9, 0),
+      startup: num(raw.startup, 0, 1e9, 0)
+    };
+    var sc = SCEN[scenario] || SCEN.base;
+    var rows = [], customers = 0, cum = -p.startup, minCum = cum, breakEven = null, revenue12 = 0, profit12 = 0;
+    for (var t = 1; t <= 12; t++) {
+      var visitors = p.visitors * Math.pow(1 + p.growth / 100, t - 1) * sc.v;
+      var conv = Math.min(100, p.conv * sc.c);
+      var fresh = visitors * conv / 100;
+      var paying;
+      if (p.model === 'subscription') { customers = customers * (1 - p.churn / 100) + fresh; paying = customers; }
+      else { paying = fresh; }
+      var revenue = paying * p.price;
+      var cost = p.fixed + p.marketing + paying * p.varCost;
+      var profit = revenue - cost;
+      cum += profit;
+      if (cum < minCum) minCum = cum;
+      if (breakEven === null && cum >= 0) breakEven = t;
+      revenue12 += revenue; profit12 += profit;
+      rows.push({ month: t, visitors: visitors, customers: paying, revenue: revenue, cost: cost, profit: profit, cumulative: cum });
+    }
+    var margin = p.price - p.varCost;
+    var needCustomers = margin > 0 ? Math.ceil((p.fixed + p.marketing) / margin) : null;
+    var needConv = null;
+    if (needCustomers !== null && p.visitors > 0) {
+      var perMonthNew = p.model === 'subscription' ? needCustomers * (p.churn / 100 || 1) : needCustomers;
+      needConv = perMonthNew / p.visitors * 100;
+    }
+    return {
+      params: p, rows: rows, revenue12: revenue12, profit12: profit12, endCumulative: cum,
+      cashNeeded: minCum < 0 ? -minCum : 0, breakEvenMonth: breakEven, needCustomers: needCustomers, needConvPct: needConv
+    };
+  }
+
   root.RZLogic = {
+    simulate: simulate,
     STATUSES: STATUSES, cleanMetrics: cleanMetrics, evaluate: evaluate, statusFor: statusFor,
     realityScore: realityScore, scoreHints: scoreHints, nextMoves: nextMoves, MOVES: MOVES,
     encodeReport: encodeReport, decodeReport: decodeReport, cleanReport: cleanReport

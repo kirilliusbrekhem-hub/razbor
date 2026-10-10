@@ -83,3 +83,33 @@ test('report encoding round-trips unicode and rejects junk', () => {
   assert.strictEqual(d2.n, 0);
   assert.strictEqual(d2.extra, undefined);
 });
+
+test('page clicks count as weak intent, never as payment', () => {
+  const ev = L.evaluate({ views: 100, wants: 12, wouldpay: 11 });
+  assert.strictEqual(ev.outcome, 'supported');
+  assert.strictEqual(ev.strength, 'weak');
+  assert.ok(ev.reasons.includes('pageintent'));
+  assert.notStrictEqual(ev.tier, 'payment');
+  const zero = L.evaluate({ views: 80, measured: true });
+  assert.strictEqual(zero.outcome, 'inconclusive');
+  assert.ok(zero.reasons.includes('pagezero'));
+  const rs = L.realityScore({ experiments: [{ status: 'done', metrics: { wouldpay: 10 }, evaluation: { outcome: 'inconclusive' } }] });
+  assert.ok(rs.score > 0 && rs.score < 25);
+});
+
+test('simulator: arithmetic, scenarios and break-even', () => {
+  const p = { model: 'subscription', price: 10, visitors: 1000, conv: 5, churn: 10, growth: 0, fixed: 100, marketing: 0, varCost: 1, startup: 0 };
+  const base = L.simulate(p, 'base');
+  assert.strictEqual(base.rows.length, 12);
+  assert.ok(Math.abs(base.rows[0].customers - 50) < 1e-9);
+  assert.ok(Math.abs(base.rows[0].revenue - 500) < 1e-9);
+  assert.ok(Math.abs(base.rows[0].profit - (500 - 100 - 50)) < 1e-9);
+  assert.strictEqual(base.breakEvenMonth, 1);
+  assert.strictEqual(base.needCustomers, Math.ceil(100 / 9));
+  assert.ok(L.simulate(p, 'pess').profit12 < base.profit12 && base.profit12 < L.simulate(p, 'opt').profit12);
+  const loss = L.simulate({ model: 'onetime', price: 5, visitors: 100, conv: 1, fixed: 200, startup: 300 }, 'base');
+  assert.strictEqual(loss.breakEvenMonth, null);
+  assert.ok(loss.cashNeeded > 300);
+  const junk = L.simulate({ price: 'abc', conv: 500, churn: -5 }, 'base');
+  assert.ok(junk.params.conv === 100 && junk.params.churn === 0 && isFinite(junk.profit12));
+});
