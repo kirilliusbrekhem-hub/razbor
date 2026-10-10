@@ -1,0 +1,9 @@
+{
+  "name": "razbor",
+  "version": "1.0.0",
+  "private": true,
+  "description": "razbor: Idea starts here.",
+  "engines": {
+    "node": ">=18"
+  }
+}

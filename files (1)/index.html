@@ -1,0 +1,622 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>razbor — Idea starts here.</title>
+<meta name="description" content="Расскажи, что умеешь, и получи готовую бизнес-идею с разбором. Или отправь свою идею и узнай, где риски и что делать первым. Плюс книги, подкасты и материалы по теме.">
+<meta name="color-scheme" content="light dark">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Golos+Text:wght@400;500;600&family=Unbounded:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #F6F8FC;
+    --surface: #FFFFFF;
+    --grid: rgba(43, 75, 219, 0.10);
+    --ink: #16213E;
+    --muted: #56617F;
+    --line: #C3CCE2;
+    --pen: #2B4BDB;
+    --marker: #FFE14D;
+    --red: #C8372B;
+
+    --font-display: "Unbounded", "Arial Black", system-ui, sans-serif;
+    --font-body: "Golos Text", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --font-hand: "Caveat", "Segoe Print", "Bradley Hand", cursive;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #0E1630;
+      --surface: #152042;
+      --grid: rgba(140, 165, 255, 0.10);
+      --ink: #E9EDFA;
+      --muted: #9AA6C8;
+      --line: #2C3860;
+      --pen: #9DB0FF;
+      --red: #FF8E81;
+    }
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background-color: var(--paper);
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 28px 28px;
+    color: var(--ink);
+    font: 400 1.0625rem/1.6 var(--font-body);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 880px; margin: 0 auto; padding: 0 20px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+  :focus-visible { outline: 3px solid var(--pen); outline-offset: 3px; }
+
+  /* Шапка */
+  .top { padding: 22px 0 0; display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+  .brand { font: 700 1.25rem var(--font-display); letter-spacing: -0.02em; }
+  .slogan { font: 600 1.45rem/1 var(--font-hand); color: var(--pen); transform: rotate(-1.5deg); display: inline-block; }
+
+  /* Первый экран */
+  .hero { padding: 40px 0 22px; }
+  h1 {
+    margin: 0 0 14px;
+    font: 700 clamp(2rem, 6.4vw, 3.5rem)/1.08 var(--font-display);
+    letter-spacing: -0.02em;
+  }
+  .lead { margin: 0; max-width: 60ch; color: var(--muted); }
+
+  /* Агент */
+  .agent { background: var(--surface); border: 2px solid var(--ink); border-radius: 6px; padding: 22px; }
+  .modes { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 18px; }
+  .mode, .chip {
+    font: 600 0.95rem var(--font-body);
+    padding: 0.55rem 1rem;
+    border: 2px solid var(--ink);
+    border-radius: 6px;
+    background: var(--surface);
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .mode:hover, .chip:hover { background: var(--marker); color: #16213E; }
+  .mode[aria-pressed="true"], .chip[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+
+  .agent label { display: block; font-weight: 600; margin: 0 0 6px; }
+  .agent textarea {
+    width: 100%;
+    min-height: 120px;
+    padding: 12px;
+    font: 400 1rem/1.5 var(--font-body);
+    color: var(--ink);
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 6px;
+    resize: vertical;
+  }
+  .examples { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 0; }
+  .example {
+    font: 400 0.88rem var(--font-body);
+    padding: 0.3rem 0.7rem;
+    border: 1px dashed var(--muted);
+    border-radius: 6px;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+  }
+  .example:hover { color: var(--ink); border-color: var(--ink); border-style: solid; }
+
+  .actions { display: flex; align-items: center; flex-wrap: wrap; gap: 14px; margin: 16px 0 0; }
+  .btn {
+    font: 600 1rem var(--font-body);
+    padding: 0.7rem 1.3rem;
+    background: var(--ink);
+    color: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .btn:hover:not(:disabled) { background: var(--marker); color: #16213E; }
+  .btn:disabled { opacity: 0.6; cursor: progress; }
+  .btn.ghost { background: transparent; color: var(--ink); }
+  .counter { color: var(--muted); font-size: 0.85rem; }
+  .status { margin: 12px 0 0; min-height: 1.5em; font-size: 0.95rem; color: var(--muted); }
+  .status.error { color: var(--red); font-weight: 500; }
+  .hint { margin: 6px 0 0; font-size: 0.82rem; color: var(--muted); }
+
+  /* Результат */
+  .result { margin: 28px 0 0; }
+  .result-card { background: var(--surface); border: 2px solid var(--ink); border-radius: 6px; padding: 22px; }
+  .result h2.result-title { margin: 0 0 8px; font: 700 clamp(1.3rem, 3.4vw, 1.8rem)/1.2 var(--font-display); letter-spacing: -0.01em; }
+  .pitch { margin: 0 0 8px; max-width: 62ch; font-size: 1.1rem; }
+  .verdict { margin: 4px 0 14px; font: 600 1.6rem/1.15 var(--font-hand); color: var(--pen); transform: rotate(-0.7deg); transform-origin: left center; display: inline-block; }
+  .scores { margin: 0 0 6px; display: grid; gap: 4px; font-size: 0.85rem; max-width: 260px; }
+  .score { display: grid; grid-template-columns: 4.2rem auto; align-items: center; gap: 8px; }
+  .score dt { color: var(--muted); }
+  .score dd { margin: 0; display: flex; gap: 3px; }
+  .dot { width: 10px; height: 10px; border: 2px solid var(--ink); border-radius: 50%; }
+  .dot.on { background: var(--ink); }
+
+  .sections { display: grid; gap: 4px; margin: 16px 0 0; border-top: 1px dashed var(--line); }
+  .sections h3 { margin: 16px 0 2px; font: 600 0.95rem var(--font-body); color: var(--muted); }
+  .sections p { margin: 0; max-width: 64ch; }
+  .sections ul, .sections ol { margin: 0; padding-left: 1.3rem; max-width: 64ch; }
+  .sections li { margin: 0 0 4px; }
+  .risk { border-left: 4px solid var(--red); padding-left: 12px; margin-top: 12px; }
+  .refusal { background: var(--surface); border: 2px solid var(--ink); border-left-width: 8px; border-radius: 6px; padding: 16px 18px; }
+  .refusal p { margin: 0; }
+
+  .result-actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 20px 0 0; }
+
+  /* Материалы */
+  .materials { margin: 28px 0 0; }
+  .materials h2, .library h2 { margin: 0 0 6px; font: 700 clamp(1.3rem, 3.4vw, 1.7rem)/1.2 var(--font-display); letter-spacing: -0.01em; }
+  .materials .sub { margin: 0 0 14px; color: var(--muted); max-width: 62ch; }
+  .group-title { margin: 22px 0 4px; font: 600 1rem var(--font-body); }
+  .res { list-style: none; margin: 0; padding: 0; }
+  .res li { padding: 14px 0; border-top: 1px dashed var(--line); max-width: 72ch; }
+  .res li:last-child { border-bottom: 1px dashed var(--line); }
+  .res-title { font-weight: 600; }
+  .res-meta { color: var(--muted); font-size: 0.92rem; }
+  .res-note { margin: 2px 0 8px; }
+  .links { display: flex; flex-wrap: wrap; gap: 8px; }
+  .link {
+    display: inline-block;
+    font: 600 0.88rem var(--font-body);
+    padding: 0.35rem 0.8rem;
+    border: 2px solid var(--ink);
+    border-radius: 6px;
+    color: var(--ink);
+    text-decoration: none;
+    background: var(--surface);
+  }
+  .link:hover { background: var(--marker); color: #16213E; }
+  .link.secondary { border-style: dashed; border-color: var(--muted); color: var(--muted); font-weight: 500; }
+  .link.secondary:hover { border-style: solid; border-color: var(--ink); color: #16213E; }
+
+  /* Готовые разборы */
+  .library { margin: 48px 0 0; padding: 28px 0 0; border-top: 2px solid var(--ink); }
+  .library .sub { margin: 0 0 14px; color: var(--muted); max-width: 62ch; }
+  .chips { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 22px; }
+  .topic-intro { margin: 0 0 14px; max-width: 62ch; }
+  .legend { margin: 0 0 14px; font-size: 0.88rem; color: var(--muted); max-width: 70ch; }
+
+  .idea { border: 2px solid var(--ink); background: var(--surface); margin: 0 0 14px; border-radius: 6px; }
+  .idea summary { list-style: none; cursor: pointer; padding: 16px 18px; display: grid; grid-template-columns: 1fr auto; gap: 6px 20px; align-items: start; }
+  .idea summary::-webkit-details-marker { display: none; }
+  .idea h3 { margin: 0; font: 500 1.02rem/1.35 var(--font-display); }
+  .idea .verdict { grid-column: 1; margin: 0; font-size: 1.5rem; }
+  .idea .scores { grid-column: 2; grid-row: 1 / span 2; margin: 0; max-width: none; }
+  .toggle { grid-column: 1; font-size: 0.85rem; color: var(--muted); }
+  .toggle::before { content: "+ "; font-weight: 600; }
+  .idea[open] .toggle::before { content: "\2212  "; }
+  .idea[open] .toggle .t-open { display: none; }
+  .idea:not([open]) .toggle .t-close { display: none; }
+  .idea-body { padding: 4px 18px 18px; border-top: 1px dashed var(--line); display: grid; gap: 14px; }
+  .idea-body h4 { margin: 14px 0 2px; font: 600 0.95rem var(--font-body); color: var(--muted); }
+  .idea-body p { margin: 0; max-width: 64ch; }
+  .idea-body ol { margin: 0; padding-left: 1.3rem; max-width: 64ch; }
+  .idea-body li { margin: 0 0 4px; }
+
+  footer { margin: 40px 0 0; padding: 20px 0 48px; border-top: 1px dashed var(--line); color: var(--muted); font-size: 0.88rem; }
+  footer p { margin: 0 0 8px; max-width: 72ch; }
+
+  noscript p { padding: 16px; background: var(--marker); color: #16213E; }
+
+  @media (max-width: 560px) {
+    .agent, .result-card { padding: 16px; }
+    .idea summary { grid-template-columns: 1fr; }
+    .idea .scores { grid-column: 1; grid-row: auto; }
+    .toggle { order: 5; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .verdict, .slogan { transform: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <span class="brand">razbor</span>
+    <span class="slogan">Idea starts here.</span>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="hero-title">
+      <h1 id="hero-title">Idea starts here.</h1>
+      <p class="lead">Расскажи, что умеешь и любишь, и агент придумает идею с разбором. Или отправь свою идею: он честно покажет, где риски и что сделать первым. Всё пишется простым языком.</p>
+    </section>
+
+    <noscript><p>Для работы сайта нужен JavaScript.</p></noscript>
+
+    <section class="agent" aria-labelledby="agent-title">
+      <h2 class="sr-only" id="agent-title">Агент razbor</h2>
+      <div class="modes" role="group" aria-label="Что сделать">
+        <button type="button" class="mode" data-mode="generate" aria-pressed="true">Придумай идею</button>
+        <button type="button" class="mode" data-mode="analyze" aria-pressed="false">Разбери мою идею</button>
+      </div>
+
+      <label for="agent-input" id="agent-label"></label>
+      <textarea id="agent-input" maxlength="1200"></textarea>
+      <div class="examples" id="examples"></div>
+
+      <div class="actions">
+        <button class="btn" id="agent-send" type="button"></button>
+        <span class="counter" id="counter" aria-hidden="true"></span>
+      </div>
+      <p class="status" id="agent-status" role="status"></p>
+      <p class="hint">Не пиши личные данные: имя, адрес, телефон, пароли. Текст отправляется в Yandex GPT.</p>
+    </section>
+
+    <section class="result" id="result" aria-live="polite" hidden></section>
+
+    <section class="library" aria-labelledby="lib-title">
+      <h2 id="lib-title">Готовые разборы</h2>
+      <p class="sub">Примеры по популярным направлениям. Выбери направление и посмотри, как выглядит разбор.</p>
+      <div class="chips" id="chips" role="group" aria-label="Направление"></div>
+      <div id="library-body"></div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Оценки и вердикты в разборах — мнение ИИ и автора сайта, а не факты и не финансовая или юридическая консультация. Цифры и правила проверяй по официальным источникам.</p>
+    <p>Ссылки на материалы подобраны вручную. Если ссылки нет, кнопка ведёт на поиск: так не получится попасть на несуществующую страницу.</p>
+  </footer>
+</div>
+
+<script src="content.js"></script>
+<script src="resources.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  var topics = (window.SITE && window.SITE.topics) || [];
+  var resources = window.RESOURCES || [];
+
+  var SCORE_LABELS = [["demand", "Спрос"], ["ease", "Старт"], ["space", "Место"]];
+
+  var MODES = {
+    generate: {
+      label: "Расскажи, что умеешь и что любишь (можно оставить пустым)",
+      placeholder: "Например: люблю игры, умею монтировать видео, денег на старт нет",
+      button: "Придумать идею",
+      examples: ["Люблю игры и монтирую видео", "Хорошо рисую", "Интересуюсь ИИ и деньгами", "Не знаю, придумай сам"]
+    },
+    analyze: {
+      label: "Опиши свою идею",
+      placeholder: "Например: сайт, где школьники учатся копить на первую покупку и считают, сколько откладывать",
+      button: "Разобрать идею",
+      examples: ["Бот, который отвечает на отзывы кафе", "Калькулятор прибыли для продавцов на маркетплейсах"]
+    }
+  };
+
+  var mode = "generate";
+  var busy = false;
+  var lastText = "";
+
+  function $(id) { return document.getElementById(id); }
+
+  function el(tag, props, children) {
+    var node = document.createElement(tag);
+    if (props) {
+      Object.keys(props).forEach(function (key) {
+        if (key === "class") node.className = props[key];
+        else if (key === "text") node.textContent = props[key];
+        else node.setAttribute(key, props[key]);
+      });
+    }
+    (children || []).forEach(function (child) { if (child) node.appendChild(child); });
+    return node;
+  }
+
+  function dots(value, label) {
+    var wrap = el("dd", { role: "img", "aria-label": label + ": " + value + " из 5" });
+    for (var i = 1; i <= 5; i++) wrap.appendChild(el("span", { class: "dot" + (i <= value ? " on" : "") }));
+    return wrap;
+  }
+
+  function scoresBlock(scores) {
+    var dl = el("dl", { class: "scores" });
+    SCORE_LABELS.forEach(function (pair) {
+      dl.appendChild(el("div", { class: "score" }, [el("dt", { text: pair[1] }), dots(scores[pair[0]], pair[1])]));
+    });
+    return dl;
+  }
+
+  /* ---------- Материалы ---------- */
+
+  function q(s) { return encodeURIComponent(s); }
+
+  function linksFor(r) {
+    var out = [];
+    function a(text, href, secondary) {
+      out.push(el("a", { class: "link" + (secondary ? " secondary" : ""), href: href, target: "_blank", rel: "noopener noreferrer", text: text }));
+    }
+    if (r.url) a("Открыть", r.url, false);
+    if (r.type === "book") {
+      a("Найти на Литрес", "https://www.litres.ru/search/?q=" + q(r.findRu || r.find || r.title), !!r.url ? true : false);
+      a("Найти на Goodreads", "https://www.goodreads.com/search?q=" + q(r.find || r.title), true);
+    } else if (r.type === "podcast") {
+      if (!r.url) a("Искать на YouTube", "https://www.youtube.com/results?search_query=" + q(r.find || r.title), false);
+      a("Найти в Яндексе", "https://yandex.ru/search/?text=" + q((r.find || r.title) + " подкаст"), true);
+    } else if (!r.url) {
+      a("Найти в Яндексе", "https://yandex.ru/search/?text=" + q(r.find || r.title), false);
+    }
+    return out;
+  }
+
+  function score(r, tags) {
+    var s = 0;
+    r.tags.forEach(function (t) { if (tags.indexOf(t) !== -1) s += 1; });
+    return s;
+  }
+
+  function pick(type, tags, limit) {
+    return resources
+      .filter(function (r) { return r.type === type; })
+      .map(function (r) { return { r: r, s: score(r, tags) }; })
+      .filter(function (x) { return x.s > 0; })
+      .sort(function (a, b) { return b.s - a.s; })
+      .slice(0, limit)
+      .map(function (x) { return x.r; });
+  }
+
+  function resourceList(items) {
+    var ul = el("ul", { class: "res" });
+    items.forEach(function (r) {
+      var meta = r.by + " · " + (r.lang === "ru" ? "на русском" : "на английском");
+      ul.appendChild(el("li", null, [
+        el("div", null, [el("span", { class: "res-title", text: r.title }), el("span", { class: "res-meta", text: " — " + meta })]),
+        el("p", { class: "res-note", text: r.note }),
+        el("div", { class: "links" }, linksFor(r))
+      ]));
+    });
+    return ul;
+  }
+
+  var matCounter = 0;
+
+  function materialsBlock(tags, heading, sub) {
+    var books = pick("book", tags, 3);
+    var podcasts = pick("podcast", tags, 3);
+    var other = pick("article", tags, 2).concat(pick("tool", tags, 3)).slice(0, 4);
+    if (!books.length && !podcasts.length && !other.length) return null;
+
+    matCounter += 1;
+    var headId = "mat-title-" + matCounter;
+    var box = el("section", { class: "materials", "aria-labelledby": headId });
+    box.appendChild(el("h2", { id: headId, text: heading }));
+    if (sub) box.appendChild(el("p", { class: "sub", text: sub }));
+    if (books.length) { box.appendChild(el("h3", { class: "group-title", text: "Книги" })); box.appendChild(resourceList(books)); }
+    if (podcasts.length) { box.appendChild(el("h3", { class: "group-title", text: "Подкасты" })); box.appendChild(resourceList(podcasts)); }
+    if (other.length) { box.appendChild(el("h3", { class: "group-title", text: "Статьи и инструменты" })); box.appendChild(resourceList(other)); }
+    return box;
+  }
+
+  /* ---------- Результат агента ---------- */
+
+  function section(title, content) {
+    return el("div", null, [el("h3", { text: title }), content]);
+  }
+
+  function resultToText(res) {
+    var lines = [res.title, "", res.pitch, "", "Для кого: " + res.audience, "Боль: " + res.pain, "Как работает: " + res.how_it_works,
+      "Как зарабатывает: " + res.money, "Похожие решения: " + res.competitors, "", "Риски:"];
+    res.risks.forEach(function (r) { lines.push("- " + r); });
+    lines.push("", "Как сделать сильнее: " + res.improve, "", "Первые шаги:");
+    res.steps.forEach(function (s, i) { lines.push((i + 1) + ". " + s); });
+    lines.push("", "Оценка (мнение ИИ): спрос " + res.scores.demand + "/5, старт " + res.scores.ease + "/5, место " + res.scores.space + "/5", "Вердикт: " + res.verdict, "", "razbor. Idea starts here.");
+    return lines.join("\n");
+  }
+
+  function copyText(text, done) {
+    function fallback() {
+      var ta = document.createElement("textarea");
+      ta.value = text; ta.setAttribute("readonly", "");
+      ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      var ok = false;
+      try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+      document.body.removeChild(ta);
+      done(ok);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () { done(true); }, fallback);
+    } else { fallback(); }
+  }
+
+  function renderResult(res) {
+    var box = $("result");
+    box.textContent = "";
+    box.hidden = false;
+
+    if (res.refusal) {
+      box.appendChild(el("div", { class: "refusal" }, [el("p", { text: res.refusal })]));
+      box.scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
+
+    var risks = el("ul");
+    res.risks.forEach(function (r) { risks.appendChild(el("li", { text: r })); });
+    var steps = el("ol");
+    res.steps.forEach(function (s) { steps.appendChild(el("li", { text: s })); });
+
+    var copyStatus = el("span", { class: "counter", role: "status" });
+    var copyBtn = el("button", { class: "btn ghost", type: "button", text: "Скопировать разбор" });
+    copyBtn.addEventListener("click", function () {
+      copyText(resultToText(res), function (ok) { copyStatus.textContent = ok ? "Скопировано." : "Не удалось скопировать, выдели текст вручную."; });
+    });
+
+    var actions = el("div", { class: "result-actions" }, [copyBtn]);
+    if (mode === "generate") {
+      var again = el("button", { class: "btn ghost", type: "button", text: "Придумать другую идею" });
+      again.addEventListener("click", function () { send(); });
+      actions.appendChild(again);
+    }
+    actions.appendChild(copyStatus);
+
+    var card = el("div", { class: "result-card" }, [
+      el("h2", { class: "result-title", text: res.title }),
+      el("p", { class: "pitch", text: res.pitch }),
+      el("p", { class: "verdict", text: res.verdict }),
+      scoresBlock(res.scores),
+      el("div", { class: "sections" }, [
+        section("Для кого", el("p", { text: res.audience })),
+        section("Какую боль решает", el("p", { text: res.pain })),
+        section("Как работает", el("p", { text: res.how_it_works })),
+        section("Как зарабатывает", el("p", { text: res.money })),
+        section("Похожие решения", el("p", { text: res.competitors })),
+        el("div", { class: "risk" }, [el("h3", { text: "Риски" }), risks]),
+        section("Как сделать сильнее", el("p", { text: res.improve })),
+        section("Первые шаги", steps)
+      ]),
+      actions
+    ]);
+    box.appendChild(card);
+
+    var mat = materialsBlock(res.tags || [], "Материалы по твоей идее", "Подобраны по теме идеи: книги, подкасты и инструменты, с которых стоит начать.");
+    if (mat) box.appendChild(mat);
+
+    box.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  /* ---------- Запрос к агенту ---------- */
+
+  function setStatus(text, isError) {
+    var s = $("agent-status");
+    s.textContent = text || "";
+    s.className = "status" + (isError ? " error" : "");
+  }
+
+  async function send() {
+    if (busy) return;
+    var text = $("agent-input").value.trim();
+    if (mode === "analyze" && text.length < 15) {
+      setStatus("Опиши идею хотя бы в одном-двух предложениях.", true);
+      $("agent-input").focus();
+      return;
+    }
+    lastText = text;
+    busy = true;
+    $("agent-send").disabled = true;
+    setStatus(mode === "generate" ? "Придумываю идею и собираю разбор…" : "Разбираю идею…", false);
+
+    var controller = new AbortController();
+    var timer = setTimeout(function () { controller.abort(); }, 40000);
+    try {
+      var response = await fetch("/api/agent", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mode: mode, text: text }),
+        signal: controller.signal
+      });
+      var data = null;
+      try { data = await response.json(); } catch (e) { data = null; }
+      if (!response.ok || !data || !data.result) {
+        throw new Error((data && data.error) || "Не получилось. Нажми кнопку ещё раз.");
+      }
+      setStatus("", false);
+      renderResult(data.result);
+    } catch (err) {
+      var msg = err && err.name === "AbortError" ? "Агент отвечает слишком долго. Попробуй ещё раз." : (err && err.message) || "Не получилось. Нажми кнопку ещё раз.";
+      setStatus(msg, true);
+    } finally {
+      clearTimeout(timer);
+      busy = false;
+      $("agent-send").disabled = false;
+    }
+  }
+
+  function applyMode(next) {
+    mode = next;
+    var cfg = MODES[mode];
+    Array.prototype.forEach.call(document.querySelectorAll(".mode"), function (b) {
+      b.setAttribute("aria-pressed", b.getAttribute("data-mode") === mode ? "true" : "false");
+    });
+    $("agent-label").textContent = cfg.label;
+    $("agent-input").setAttribute("placeholder", cfg.placeholder);
+    $("agent-send").textContent = cfg.button;
+
+    var ex = $("examples");
+    ex.textContent = "";
+    cfg.examples.forEach(function (t) {
+      var b = el("button", { class: "example", type: "button", text: t });
+      b.addEventListener("click", function () {
+        $("agent-input").value = t;
+        updateCounter();
+        $("agent-input").focus();
+      });
+      ex.appendChild(b);
+    });
+    setStatus("", false);
+  }
+
+  function updateCounter() {
+    $("counter").textContent = $("agent-input").value.length + " / 1200";
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll(".mode"), function (b) {
+    b.addEventListener("click", function () { applyMode(b.getAttribute("data-mode")); });
+  });
+  $("agent-input").addEventListener("input", updateCounter);
+  $("agent-input").addEventListener("keydown", function (e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") { e.preventDefault(); send(); }
+  });
+  $("agent-send").addEventListener("click", send);
+  applyMode("generate");
+  updateCounter();
+
+  /* ---------- Готовые разборы ---------- */
+
+  function renderIdea(idea, open) {
+    var summary = el("summary", null, [
+      el("h3", { text: idea.title }),
+      scoresBlock(idea.scores),
+      el("p", { class: "verdict", text: idea.verdict }),
+      el("span", { class: "toggle" }, [el("span", { class: "t-open", text: "Открыть разбор" }), el("span", { class: "t-close", text: "Свернуть разбор" })])
+    ]);
+    var steps = el("ol");
+    idea.steps.forEach(function (s) { steps.appendChild(el("li", { text: s })); });
+    var body = el("div", { class: "idea-body" }, [
+      el("div", null, [el("h4", { text: "Что это" }), el("p", { text: idea.what })]),
+      el("div", null, [el("h4", { text: "Как зарабатывает" }), el("p", { text: idea.money })]),
+      el("div", { class: "risk" }, [el("h4", { text: "Риски" }), el("p", { text: idea.risks })]),
+      el("div", null, [el("h4", { text: "Первые шаги" }), steps])
+    ]);
+    var d = el("details", { class: "idea" }, [summary, body]);
+    if (open) d.setAttribute("open", "");
+    return d;
+  }
+
+  function renderTopic(id) {
+    var topic = null;
+    topics.forEach(function (t) { if (t.id === id) topic = t; });
+    if (!topic) return;
+    Array.prototype.forEach.call($("chips").children, function (b) {
+      b.setAttribute("aria-pressed", b.getAttribute("data-id") === id ? "true" : "false");
+    });
+    var body = $("library-body");
+    body.textContent = "";
+    body.appendChild(el("p", { class: "topic-intro", text: topic.intro }));
+    body.appendChild(el("p", { class: "legend", text: "Оценки от 1 до 5. Спрос: сколько людей ищут решение. Старт: насколько легко начать без денег. Место: чем выше, тем меньше конкурентов." }));
+    topic.ideas.forEach(function (idea, i) { body.appendChild(renderIdea(idea, i === 0)); });
+    var mat = materialsBlock([topic.id], "Материалы по направлению", null);
+    if (mat) body.appendChild(mat);
+  }
+
+  topics.forEach(function (t) {
+    var b = el("button", { class: "chip", type: "button", "data-id": t.id, "aria-pressed": "false", text: t.name });
+    b.addEventListener("click", function () { renderTopic(t.id); });
+    $("chips").appendChild(b);
+  });
+  if (topics.length) renderTopic(topics[0].id);
+})();
+</script>
+</body>
+</html>
