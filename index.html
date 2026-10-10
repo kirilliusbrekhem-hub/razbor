@@ -63,6 +63,19 @@
   .brand { font: 700 1.25rem var(--font-display); letter-spacing: -0.02em; }
   .slogan { font: 600 1.45rem/1 var(--font-hand); color: var(--pen); transform: rotate(-1.5deg); display: inline-block; }
 
+  .lang { margin-left: auto; display: flex; gap: 6px; }
+  .lang button {
+    font: 600 0.85rem var(--font-body);
+    padding: 0.3rem 0.7rem;
+    border: 2px solid var(--ink);
+    border-radius: 6px;
+    background: var(--surface);
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .lang button:hover { background: var(--marker); color: #16213E; }
+  .lang button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+
   /* Первый экран */
   .hero { padding: 40px 0 22px; }
   h1 {
@@ -225,21 +238,25 @@
   <header class="top">
     <span class="brand">razbor</span>
     <span class="slogan">Idea starts here.</span>
+    <div class="lang" role="group" aria-label="Language / Язык">
+      <button type="button" data-lang="ru" aria-pressed="true">RU</button>
+      <button type="button" data-lang="en" aria-pressed="false">EN</button>
+    </div>
   </header>
 
   <main>
     <section class="hero" aria-labelledby="hero-title">
       <h1 id="hero-title">Idea starts here.</h1>
-      <p class="lead">Расскажи, что умеешь и любишь, и агент придумает идею с разбором. Или отправь свою идею: он честно покажет, где риски и что сделать первым. Всё пишется простым языком.</p>
+      <p class="lead" data-i18n="lead"></p>
     </section>
 
-    <noscript><p>Для работы сайта нужен JavaScript.</p></noscript>
+    <noscript><p>JavaScript is required / Для работы сайта нужен JavaScript.</p></noscript>
 
     <section class="agent" aria-labelledby="agent-title">
-      <h2 class="sr-only" id="agent-title">Агент razbor</h2>
-      <div class="modes" role="group" aria-label="Что сделать">
-        <button type="button" class="mode" data-mode="generate" aria-pressed="true">Придумай идею</button>
-        <button type="button" class="mode" data-mode="analyze" aria-pressed="false">Разбери мою идею</button>
+      <h2 class="sr-only" id="agent-title" data-i18n="agentTitle"></h2>
+      <div class="modes" role="group" data-i18n-aria="modesAria">
+        <button type="button" class="mode" data-mode="generate" aria-pressed="true"></button>
+        <button type="button" class="mode" data-mode="analyze" aria-pressed="false"></button>
       </div>
 
       <label for="agent-input" id="agent-label"></label>
@@ -251,55 +268,155 @@
         <span class="counter" id="counter" aria-hidden="true"></span>
       </div>
       <p class="status" id="agent-status" role="status"></p>
-      <p class="hint">Не пиши личные данные: имя, адрес, телефон, пароли. Текст отправляется в Yandex GPT.</p>
+      <p class="hint" data-i18n="hint"></p>
     </section>
 
     <section class="result" id="result" aria-live="polite" hidden></section>
 
     <section class="library" aria-labelledby="lib-title">
-      <h2 id="lib-title">Готовые разборы</h2>
-      <p class="sub">Примеры по популярным направлениям. Выбери направление и посмотри, как выглядит разбор.</p>
-      <div class="chips" id="chips" role="group" aria-label="Направление"></div>
+      <h2 id="lib-title" data-i18n="libTitle"></h2>
+      <p class="sub" data-i18n="libSub"></p>
+      <div class="chips" id="chips" role="group" data-i18n-aria="topicAria"></div>
       <div id="library-body"></div>
     </section>
   </main>
 
   <footer>
-    <p>Оценки и вердикты в разборах — мнение ИИ и автора сайта, а не факты и не финансовая или юридическая консультация. Цифры и правила проверяй по официальным источникам.</p>
-    <p>Ссылки на материалы подобраны вручную. Если ссылки нет, кнопка ведёт на поиск: так не получится попасть на несуществующую страницу.</p>
+    <p data-i18n="foot1"></p>
+    <p data-i18n="foot2"></p>
   </footer>
 </div>
 
 <script src="content.js"></script>
+<script src="content.en.js"></script>
 <script src="resources.js"></script>
+<script src="resources.en.js"></script>
 <script>
 (function () {
   "use strict";
 
-  var topics = (window.SITE && window.SITE.topics) || [];
+  var RU_TOPICS = (window.SITE && window.SITE.topics) || [];
+  var EN_TOPICS = (window.SITE_EN && window.SITE_EN.topics) || [];
   var resources = window.RESOURCES || [];
+  var RES_EN = window.RESOURCES_EN || {};
 
-  var SCORE_LABELS = [["demand", "Спрос"], ["ease", "Старт"], ["space", "Место"]];
-
-  var MODES = {
-    generate: {
-      label: "Расскажи, что умеешь и что любишь (можно оставить пустым)",
-      placeholder: "Например: люблю игры, умею монтировать видео, денег на старт нет",
-      button: "Придумать идею",
-      examples: ["Люблю игры и монтирую видео", "Хорошо рисую", "Интересуюсь ИИ и деньгами", "Не знаю, придумай сам"]
+  var T = {
+    ru: {
+      docTitle: "razbor — Idea starts here.",
+      lead: "Расскажи, что умеешь и любишь, и агент придумает идею с разбором. Или отправь свою идею: он честно покажет, где риски и что сделать первым. Всё пишется простым языком.",
+      agentTitle: "Агент razbor",
+      modesAria: "Что сделать",
+      modeGenerate: "Придумай идею",
+      modeAnalyze: "Разбери мою идею",
+      hint: "Не пиши личные данные: имя, адрес, телефон, пароли. Текст отправляется в Yandex GPT.",
+      libTitle: "Готовые разборы",
+      libSub: "Примеры по популярным направлениям. Выбери направление и посмотри, как выглядит разбор.",
+      topicAria: "Направление",
+      foot1: "Оценки и вердикты в разборах — мнение ИИ и автора сайта, а не факты и не финансовая или юридическая консультация. Цифры и правила проверяй по официальным источникам.",
+      foot2: "Ссылки на материалы подобраны вручную. Если ссылки нет, кнопка ведёт на поиск: так не получится попасть на несуществующую страницу.",
+      generateLabel: "Расскажи, что умеешь и что любишь (можно оставить пустым)",
+      generatePh: "Например: люблю игры, умею монтировать видео, денег на старт нет",
+      generateBtn: "Придумать идею",
+      generateEx: ["Люблю игры и монтирую видео", "Хорошо рисую", "Интересуюсь ИИ и деньгами", "Не знаю, придумай сам"],
+      analyzeLabel: "Опиши свою идею",
+      analyzePh: "Например: сайт, где школьники учатся копить на первую покупку и считают, сколько откладывать",
+      analyzeBtn: "Разобрать идею",
+      analyzeEx: ["Бот, который отвечает на отзывы кафе", "Калькулятор прибыли для продавцов на маркетплейсах"],
+      statusGen: "Придумываю идею и собираю разбор…",
+      statusAn: "Разбираю идею…",
+      tooShort: "Опиши идею хотя бы в одном-двух предложениях.",
+      failed: "Не получилось. Нажми кнопку ещё раз.",
+      slow: "Агент отвечает слишком долго. Попробуй ещё раз.",
+      sPeople: "Для кого", sPain: "Какую боль решает", sHow: "Как работает", sMoney: "Как зарабатывает",
+      sComp: "Похожие решения", sRisks: "Риски", sImprove: "Как сделать сильнее", sSteps: "Первые шаги",
+      copyBtn: "Скопировать разбор", copied: "Скопировано.", copyFail: "Не удалось скопировать, выдели текст вручную.",
+      again: "Придумать другую идею",
+      score: { demand: "Спрос", ease: "Старт", space: "Место" },
+      outOf: "из 5",
+      matIdea: "Материалы по твоей идее",
+      matIdeaSub: "Подобраны по теме идеи: книги, подкасты и инструменты, с которых стоит начать.",
+      matTopic: "Материалы по направлению",
+      gBooks: "Книги", gPodcasts: "Подкасты", gOther: "Статьи и инструменты",
+      inRu: "на русском", inEn: "на английском",
+      open: "Открыть", findLitres: "Найти на Литрес", findGoodreads: "Найти на Goodreads",
+      findAmazon: "Найти на Amazon", findYoutube: "Искать на YouTube", findYandex: "Найти в Яндексе",
+      findGoogle: "Найти в Google", findYandexPod: "Найти в Яндексе",
+      legend: "Оценки от 1 до 5. Спрос: сколько людей ищут решение. Старт: насколько легко начать без денег. Место: чем выше, тем меньше конкурентов.",
+      what: "Что это", money: "Как зарабатывает", risks: "Риски", steps: "Первые шаги",
+      openIdea: "Открыть разбор", closeIdea: "Свернуть разбор",
+      forWhom: "Для кого: ", pain: "Боль: ", how: "Как работает: ", earn: "Как зарабатывает: ",
+      similar: "Похожие решения: ", riskHead: "Риски:", improveHead: "Как сделать сильнее: ", stepsHead: "Первые шаги:",
+      scoreLine: "Оценка (мнение ИИ): ", verdictLine: "Вердикт: ",
+      demandWord: "спрос", easeWord: "старт", spaceWord: "место"
     },
-    analyze: {
-      label: "Опиши свою идею",
-      placeholder: "Например: сайт, где школьники учатся копить на первую покупку и считают, сколько откладывать",
-      button: "Разобрать идею",
-      examples: ["Бот, который отвечает на отзывы кафе", "Калькулятор прибыли для продавцов на маркетплейсах"]
+    en: {
+      docTitle: "razbor — Idea starts here.",
+      lead: "Tell us what you can do and love, and the agent will come up with an idea and review it. Or send your own idea: it will honestly show the risks and what to do first. Everything is written in plain language.",
+      agentTitle: "The razbor agent",
+      modesAria: "What to do",
+      modeGenerate: "Come up with an idea",
+      modeAnalyze: "Review my idea",
+      hint: "Do not enter personal data: name, address, phone, passwords. The text is sent to Yandex GPT.",
+      libTitle: "Ready-made reviews",
+      libSub: "Examples across popular areas. Pick an area and see what a review looks like.",
+      topicAria: "Area",
+      foot1: "Scores and verdicts in the reviews are the opinion of the AI and the site author, not facts and not financial or legal advice. Check numbers and rules against official sources.",
+      foot2: "Links to materials are picked by hand. If there is no direct link, the button leads to a search, so you cannot land on a page that does not exist.",
+      generateLabel: "Tell us what you can do and what you like (you can leave it empty)",
+      generatePh: "For example: I like games, I can edit video, I have no money to start",
+      generateBtn: "Come up with an idea",
+      generateEx: ["I like games and edit videos", "I draw well", "I am into AI and money", "No idea, you decide"],
+      analyzeLabel: "Describe your idea",
+      analyzePh: "For example: a site where students learn to save for a first purchase and calculate how much to set aside",
+      analyzeBtn: "Review the idea",
+      analyzeEx: ["A bot that replies to cafe reviews", "A profit calculator for marketplace sellers"],
+      statusGen: "Coming up with an idea and building the review…",
+      statusAn: "Reviewing the idea…",
+      tooShort: "Describe the idea in at least one or two sentences.",
+      failed: "That did not work. Press the button again.",
+      slow: "The agent is taking too long. Please try again.",
+      sPeople: "Who it is for", sPain: "The pain it solves", sHow: "How it works", sMoney: "How it earns",
+      sComp: "Similar solutions", sRisks: "Risks", sImprove: "How to make it stronger", sSteps: "First steps",
+      copyBtn: "Copy the review", copied: "Copied.", copyFail: "Could not copy, select the text manually.",
+      again: "Come up with another idea",
+      score: { demand: "Demand", ease: "Start", space: "Room" },
+      outOf: "out of 5",
+      matIdea: "Materials for your idea",
+      matIdeaSub: "Picked by the topic of the idea: books, podcasts and tools to start with.",
+      matTopic: "Materials for this area",
+      gBooks: "Books", gPodcasts: "Podcasts", gOther: "Articles and tools",
+      inRu: "in Russian", inEn: "in English",
+      open: "Open", findLitres: "Find on Litres", findGoodreads: "Find on Goodreads",
+      findAmazon: "Find on Amazon", findYoutube: "Search on YouTube", findYandex: "Search on Yandex",
+      findGoogle: "Search on Google", findYandexPod: "Search on Google",
+      legend: "Scores from 1 to 5. Demand: how many people look for a solution. Start: how easy it is to begin with no money. Room: the higher, the fewer competitors.",
+      what: "What it is", money: "How it earns", risks: "Risks", steps: "First steps",
+      openIdea: "Open the review", closeIdea: "Collapse the review",
+      forWhom: "Who it is for: ", pain: "Pain: ", how: "How it works: ", earn: "How it earns: ",
+      similar: "Similar solutions: ", riskHead: "Risks:", improveHead: "How to make it stronger: ", stepsHead: "First steps:",
+      scoreLine: "Score (AI opinion): ", verdictLine: "Verdict: ",
+      demandWord: "demand", easeWord: "start", spaceWord: "room"
     }
   };
 
+  var LANG = "ru";
+  try {
+    var saved = localStorage.getItem("lang");
+    if (saved === "ru" || saved === "en") LANG = saved;
+    else if (navigator.language && navigator.language.toLowerCase().indexOf("ru") !== 0) LANG = "en";
+  } catch (e) {
+    if (navigator.language && navigator.language.toLowerCase().indexOf("ru") !== 0) LANG = "en";
+  }
+
+  var SCORE_KEYS = ["demand", "ease", "space"];
   var mode = "generate";
   var busy = false;
-  var lastText = "";
+  var lastResult = null;
+  var lastResultLang = null;
+  var currentTopic = null;
+  var matCounter = 0;
 
+  function t(key) { return T[LANG][key]; }
   function $(id) { return document.getElementById(id); }
 
   function el(tag, props, children) {
@@ -316,15 +433,16 @@
   }
 
   function dots(value, label) {
-    var wrap = el("dd", { role: "img", "aria-label": label + ": " + value + " из 5" });
+    var wrap = el("dd", { role: "img", "aria-label": label + ": " + value + " " + t("outOf") });
     for (var i = 1; i <= 5; i++) wrap.appendChild(el("span", { class: "dot" + (i <= value ? " on" : "") }));
     return wrap;
   }
 
   function scoresBlock(scores) {
     var dl = el("dl", { class: "scores" });
-    SCORE_LABELS.forEach(function (pair) {
-      dl.appendChild(el("div", { class: "score" }, [el("dt", { text: pair[1] }), dots(scores[pair[0]], pair[1])]));
+    SCORE_KEYS.forEach(function (k) {
+      var label = t("score")[k];
+      dl.appendChild(el("div", { class: "score" }, [el("dt", { text: label }), dots(scores[k], label)]));
     });
     return dl;
   }
@@ -333,34 +451,49 @@
 
   function q(s) { return encodeURIComponent(s); }
 
+  function view(r) {
+    var en = LANG === "en" ? (RES_EN[r.title] || {}) : {};
+    return { title: en.title || r.title, by: en.by || r.by, note: en.note || r.note };
+  }
+
   function linksFor(r) {
     var out = [];
     function a(text, href, secondary) {
       out.push(el("a", { class: "link" + (secondary ? " secondary" : ""), href: href, target: "_blank", rel: "noopener noreferrer", text: text }));
     }
-    if (r.url) a("Открыть", r.url, false);
+    var v = view(r);
+    var search = r.find || r.title;
+    if (r.url) a(t("open"), r.url, false);
     if (r.type === "book") {
-      a("Найти на Литрес", "https://www.litres.ru/search/?q=" + q(r.findRu || r.find || r.title), !!r.url ? true : false);
-      a("Найти на Goodreads", "https://www.goodreads.com/search?q=" + q(r.find || r.title), true);
+      if (LANG === "ru") {
+        a(t("findLitres"), "https://www.litres.ru/search/?q=" + q(r.findRu || search), !!r.url);
+        a(t("findGoodreads"), "https://www.goodreads.com/search?q=" + q(search), true);
+      } else {
+        a(t("findAmazon"), "https://www.amazon.com/s?k=" + q(search), !!r.url);
+        a(t("findGoodreads"), "https://www.goodreads.com/search?q=" + q(search), true);
+      }
     } else if (r.type === "podcast") {
-      if (!r.url) a("Искать на YouTube", "https://www.youtube.com/results?search_query=" + q(r.find || r.title), false);
-      a("Найти в Яндексе", "https://yandex.ru/search/?text=" + q((r.find || r.title) + " подкаст"), true);
+      if (!r.url) a(t("findYoutube"), "https://www.youtube.com/results?search_query=" + q(search), false);
+      if (LANG === "ru") a(t("findYandexPod"), "https://yandex.ru/search/?text=" + q(search + " подкаст"), true);
+      else a(t("findYandexPod"), "https://www.google.com/search?q=" + q(search + " podcast"), true);
     } else if (!r.url) {
-      a("Найти в Яндексе", "https://yandex.ru/search/?text=" + q(r.find || r.title), false);
+      if (LANG === "ru") a(t("findYandex"), "https://yandex.ru/search/?text=" + q(search), false);
+      else a(t("findGoogle"), "https://www.google.com/search?q=" + q(v.title + " " + v.by), false);
     }
     return out;
   }
 
-  function score(r, tags) {
+  function relevance(r, tags) {
     var s = 0;
-    r.tags.forEach(function (t) { if (tags.indexOf(t) !== -1) s += 1; });
+    r.tags.forEach(function (tg) { if (tags.indexOf(tg) !== -1) s += 1; });
+    if (s > 0 && r.lang === LANG) s += 0.5;
     return s;
   }
 
   function pick(type, tags, limit) {
     return resources
       .filter(function (r) { return r.type === type; })
-      .map(function (r) { return { r: r, s: score(r, tags) }; })
+      .map(function (r) { return { r: r, s: relevance(r, tags) }; })
       .filter(function (x) { return x.s > 0; })
       .sort(function (a, b) { return b.s - a.s; })
       .slice(0, limit)
@@ -370,17 +503,16 @@
   function resourceList(items) {
     var ul = el("ul", { class: "res" });
     items.forEach(function (r) {
-      var meta = r.by + " · " + (r.lang === "ru" ? "на русском" : "на английском");
+      var v = view(r);
+      var meta = v.by + " · " + (r.lang === "ru" ? t("inRu") : t("inEn"));
       ul.appendChild(el("li", null, [
-        el("div", null, [el("span", { class: "res-title", text: r.title }), el("span", { class: "res-meta", text: " — " + meta })]),
-        el("p", { class: "res-note", text: r.note }),
+        el("div", null, [el("span", { class: "res-title", text: v.title }), el("span", { class: "res-meta", text: " — " + meta })]),
+        el("p", { class: "res-note", text: v.note }),
         el("div", { class: "links" }, linksFor(r))
       ]));
     });
     return ul;
   }
-
-  var matCounter = 0;
 
   function materialsBlock(tags, heading, sub) {
     var books = pick("book", tags, 3);
@@ -393,9 +525,9 @@
     var box = el("section", { class: "materials", "aria-labelledby": headId });
     box.appendChild(el("h2", { id: headId, text: heading }));
     if (sub) box.appendChild(el("p", { class: "sub", text: sub }));
-    if (books.length) { box.appendChild(el("h3", { class: "group-title", text: "Книги" })); box.appendChild(resourceList(books)); }
-    if (podcasts.length) { box.appendChild(el("h3", { class: "group-title", text: "Подкасты" })); box.appendChild(resourceList(podcasts)); }
-    if (other.length) { box.appendChild(el("h3", { class: "group-title", text: "Статьи и инструменты" })); box.appendChild(resourceList(other)); }
+    if (books.length) { box.appendChild(el("h3", { class: "group-title", text: t("gBooks") })); box.appendChild(resourceList(books)); }
+    if (podcasts.length) { box.appendChild(el("h3", { class: "group-title", text: t("gPodcasts") })); box.appendChild(resourceList(podcasts)); }
+    if (other.length) { box.appendChild(el("h3", { class: "group-title", text: t("gOther") })); box.appendChild(resourceList(other)); }
     return box;
   }
 
@@ -406,12 +538,13 @@
   }
 
   function resultToText(res) {
-    var lines = [res.title, "", res.pitch, "", "Для кого: " + res.audience, "Боль: " + res.pain, "Как работает: " + res.how_it_works,
-      "Как зарабатывает: " + res.money, "Похожие решения: " + res.competitors, "", "Риски:"];
+    var lines = [res.title, "", res.pitch, "", t("forWhom") + res.audience, t("pain") + res.pain, t("how") + res.how_it_works,
+      t("earn") + res.money, t("similar") + res.competitors, "", t("riskHead")];
     res.risks.forEach(function (r) { lines.push("- " + r); });
-    lines.push("", "Как сделать сильнее: " + res.improve, "", "Первые шаги:");
+    lines.push("", t("improveHead") + res.improve, "", t("stepsHead"));
     res.steps.forEach(function (s, i) { lines.push((i + 1) + ". " + s); });
-    lines.push("", "Оценка (мнение ИИ): спрос " + res.scores.demand + "/5, старт " + res.scores.ease + "/5, место " + res.scores.space + "/5", "Вердикт: " + res.verdict, "", "razbor. Idea starts here.");
+    lines.push("", t("scoreLine") + t("demandWord") + " " + res.scores.demand + "/5, " + t("easeWord") + " " + res.scores.ease + "/5, " + t("spaceWord") + " " + res.scores.space + "/5",
+      t("verdictLine") + res.verdict, "", "razbor. Idea starts here.");
     return lines.join("\n");
   }
 
@@ -431,14 +564,14 @@
     } else { fallback(); }
   }
 
-  function renderResult(res) {
+  function renderResult(res, scroll) {
     var box = $("result");
     box.textContent = "";
     box.hidden = false;
 
     if (res.refusal) {
       box.appendChild(el("div", { class: "refusal" }, [el("p", { text: res.refusal })]));
-      box.scrollIntoView({ behavior: "smooth", block: "start" });
+      if (scroll) box.scrollIntoView({ behavior: "smooth", block: "start" });
       return;
     }
 
@@ -448,15 +581,15 @@
     res.steps.forEach(function (s) { steps.appendChild(el("li", { text: s })); });
 
     var copyStatus = el("span", { class: "counter", role: "status" });
-    var copyBtn = el("button", { class: "btn ghost", type: "button", text: "Скопировать разбор" });
+    var copyBtn = el("button", { class: "btn ghost", type: "button", text: t("copyBtn") });
     copyBtn.addEventListener("click", function () {
-      copyText(resultToText(res), function (ok) { copyStatus.textContent = ok ? "Скопировано." : "Не удалось скопировать, выдели текст вручную."; });
+      copyText(resultToText(res), function (ok) { copyStatus.textContent = ok ? t("copied") : t("copyFail"); });
     });
 
     var actions = el("div", { class: "result-actions" }, [copyBtn]);
-    if (mode === "generate") {
-      var again = el("button", { class: "btn ghost", type: "button", text: "Придумать другую идею" });
-      again.addEventListener("click", function () { send(); });
+    if (res.__mode === "generate") {
+      var again = el("button", { class: "btn ghost", type: "button", text: t("again") });
+      again.addEventListener("click", function () { mode = "generate"; send(); });
       actions.appendChild(again);
     }
     actions.appendChild(copyStatus);
@@ -467,23 +600,23 @@
       el("p", { class: "verdict", text: res.verdict }),
       scoresBlock(res.scores),
       el("div", { class: "sections" }, [
-        section("Для кого", el("p", { text: res.audience })),
-        section("Какую боль решает", el("p", { text: res.pain })),
-        section("Как работает", el("p", { text: res.how_it_works })),
-        section("Как зарабатывает", el("p", { text: res.money })),
-        section("Похожие решения", el("p", { text: res.competitors })),
-        el("div", { class: "risk" }, [el("h3", { text: "Риски" }), risks]),
-        section("Как сделать сильнее", el("p", { text: res.improve })),
-        section("Первые шаги", steps)
+        section(t("sPeople"), el("p", { text: res.audience })),
+        section(t("sPain"), el("p", { text: res.pain })),
+        section(t("sHow"), el("p", { text: res.how_it_works })),
+        section(t("sMoney"), el("p", { text: res.money })),
+        section(t("sComp"), el("p", { text: res.competitors })),
+        el("div", { class: "risk" }, [el("h3", { text: t("sRisks") }), risks]),
+        section(t("sImprove"), el("p", { text: res.improve })),
+        section(t("sSteps"), steps)
       ]),
       actions
     ]);
     box.appendChild(card);
 
-    var mat = materialsBlock(res.tags || [], "Материалы по твоей идее", "Подобраны по теме идеи: книги, подкасты и инструменты, с которых стоит начать.");
+    var mat = materialsBlock(res.tags || [], t("matIdea"), t("matIdeaSub"));
     if (mat) box.appendChild(mat);
 
-    box.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (scroll) box.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   /* ---------- Запрос к агенту ---------- */
@@ -498,14 +631,15 @@
     if (busy) return;
     var text = $("agent-input").value.trim();
     if (mode === "analyze" && text.length < 15) {
-      setStatus("Опиши идею хотя бы в одном-двух предложениях.", true);
+      setStatus(t("tooShort"), true);
       $("agent-input").focus();
       return;
     }
-    lastText = text;
     busy = true;
     $("agent-send").disabled = true;
-    setStatus(mode === "generate" ? "Придумываю идею и собираю разбор…" : "Разбираю идею…", false);
+    var sendMode = mode;
+    var sendLang = LANG;
+    setStatus(sendMode === "generate" ? t("statusGen") : t("statusAn"), false);
 
     var controller = new AbortController();
     var timer = setTimeout(function () { controller.abort(); }, 40000);
@@ -513,18 +647,21 @@
       var response = await fetch("/api/agent", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mode: mode, text: text }),
+        body: JSON.stringify({ mode: sendMode, text: text, lang: sendLang }),
         signal: controller.signal
       });
       var data = null;
       try { data = await response.json(); } catch (e) { data = null; }
       if (!response.ok || !data || !data.result) {
-        throw new Error((data && data.error) || "Не получилось. Нажми кнопку ещё раз.");
+        throw new Error((data && data.error) || t("failed"));
       }
       setStatus("", false);
-      renderResult(data.result);
+      data.result.__mode = sendMode;
+      lastResult = data.result;
+      lastResultLang = sendLang;
+      renderResult(lastResult, true);
     } catch (err) {
-      var msg = err && err.name === "AbortError" ? "Агент отвечает слишком долго. Попробуй ещё раз." : (err && err.message) || "Не получилось. Нажми кнопку ещё раз.";
+      var msg = err && err.name === "AbortError" ? t("slow") : (err && err.message) || t("failed");
       setStatus(msg, true);
     } finally {
       clearTimeout(timer);
@@ -535,20 +672,20 @@
 
   function applyMode(next) {
     mode = next;
-    var cfg = MODES[mode];
+    var prefix = mode === "generate" ? "generate" : "analyze";
     Array.prototype.forEach.call(document.querySelectorAll(".mode"), function (b) {
       b.setAttribute("aria-pressed", b.getAttribute("data-mode") === mode ? "true" : "false");
     });
-    $("agent-label").textContent = cfg.label;
-    $("agent-input").setAttribute("placeholder", cfg.placeholder);
-    $("agent-send").textContent = cfg.button;
+    $("agent-label").textContent = t(prefix + "Label");
+    $("agent-input").setAttribute("placeholder", t(prefix + "Ph"));
+    $("agent-send").textContent = t(prefix + "Btn");
 
     var ex = $("examples");
     ex.textContent = "";
-    cfg.examples.forEach(function (t) {
-      var b = el("button", { class: "example", type: "button", text: t });
+    t(prefix + "Ex").forEach(function (txt) {
+      var b = el("button", { class: "example", type: "button", text: txt });
       b.addEventListener("click", function () {
-        $("agent-input").value = t;
+        $("agent-input").value = txt;
         updateCounter();
         $("agent-input").focus();
       });
@@ -569,53 +706,96 @@
     if ((e.ctrlKey || e.metaKey) && e.key === "Enter") { e.preventDefault(); send(); }
   });
   $("agent-send").addEventListener("click", send);
-  applyMode("generate");
-  updateCounter();
 
   /* ---------- Готовые разборы ---------- */
+
+  function topics() { return LANG === "en" && EN_TOPICS.length ? EN_TOPICS : RU_TOPICS; }
 
   function renderIdea(idea, open) {
     var summary = el("summary", null, [
       el("h3", { text: idea.title }),
       scoresBlock(idea.scores),
       el("p", { class: "verdict", text: idea.verdict }),
-      el("span", { class: "toggle" }, [el("span", { class: "t-open", text: "Открыть разбор" }), el("span", { class: "t-close", text: "Свернуть разбор" })])
+      el("span", { class: "toggle" }, [el("span", { class: "t-open", text: t("openIdea") }), el("span", { class: "t-close", text: t("closeIdea") })])
     ]);
     var steps = el("ol");
     idea.steps.forEach(function (s) { steps.appendChild(el("li", { text: s })); });
     var body = el("div", { class: "idea-body" }, [
-      el("div", null, [el("h4", { text: "Что это" }), el("p", { text: idea.what })]),
-      el("div", null, [el("h4", { text: "Как зарабатывает" }), el("p", { text: idea.money })]),
-      el("div", { class: "risk" }, [el("h4", { text: "Риски" }), el("p", { text: idea.risks })]),
-      el("div", null, [el("h4", { text: "Первые шаги" }), steps])
+      el("div", null, [el("h4", { text: t("what") }), el("p", { text: idea.what })]),
+      el("div", null, [el("h4", { text: t("money") }), el("p", { text: idea.money })]),
+      el("div", { class: "risk" }, [el("h4", { text: t("risks") }), el("p", { text: idea.risks })]),
+      el("div", null, [el("h4", { text: t("steps") }), steps])
     ]);
     var d = el("details", { class: "idea" }, [summary, body]);
     if (open) d.setAttribute("open", "");
     return d;
   }
 
+  function renderChips() {
+    var box = $("chips");
+    box.textContent = "";
+    topics().forEach(function (tp) {
+      var b = el("button", { class: "chip", type: "button", "data-id": tp.id, "aria-pressed": "false", text: tp.name });
+      b.addEventListener("click", function () { renderTopic(tp.id); });
+      box.appendChild(b);
+    });
+  }
+
   function renderTopic(id) {
     var topic = null;
-    topics.forEach(function (t) { if (t.id === id) topic = t; });
+    topics().forEach(function (tp) { if (tp.id === id) topic = tp; });
     if (!topic) return;
+    currentTopic = id;
     Array.prototype.forEach.call($("chips").children, function (b) {
       b.setAttribute("aria-pressed", b.getAttribute("data-id") === id ? "true" : "false");
     });
     var body = $("library-body");
     body.textContent = "";
     body.appendChild(el("p", { class: "topic-intro", text: topic.intro }));
-    body.appendChild(el("p", { class: "legend", text: "Оценки от 1 до 5. Спрос: сколько людей ищут решение. Старт: насколько легко начать без денег. Место: чем выше, тем меньше конкурентов." }));
+    body.appendChild(el("p", { class: "legend", text: t("legend") }));
     topic.ideas.forEach(function (idea, i) { body.appendChild(renderIdea(idea, i === 0)); });
-    var mat = materialsBlock([topic.id], "Материалы по направлению", null);
+    var mat = materialsBlock([topic.id], t("matTopic"), null);
     if (mat) body.appendChild(mat);
   }
 
-  topics.forEach(function (t) {
-    var b = el("button", { class: "chip", type: "button", "data-id": t.id, "aria-pressed": "false", text: t.name });
-    b.addEventListener("click", function () { renderTopic(t.id); });
-    $("chips").appendChild(b);
+  /* ---------- Язык ---------- */
+
+  function applyLang() {
+    document.documentElement.lang = LANG;
+    document.title = t("docTitle");
+    Array.prototype.forEach.call(document.querySelectorAll("[data-i18n]"), function (n) {
+      n.textContent = t(n.getAttribute("data-i18n"));
+    });
+    Array.prototype.forEach.call(document.querySelectorAll("[data-i18n-aria]"), function (n) {
+      n.setAttribute("aria-label", t(n.getAttribute("data-i18n-aria")));
+    });
+    document.querySelector('.mode[data-mode="generate"]').textContent = t("modeGenerate");
+    document.querySelector('.mode[data-mode="analyze"]').textContent = t("modeAnalyze");
+    Array.prototype.forEach.call(document.querySelectorAll(".lang button"), function (b) {
+      b.setAttribute("aria-pressed", b.getAttribute("data-lang") === LANG ? "true" : "false");
+    });
+    applyMode(mode);
+    renderChips();
+    var list = topics();
+    var keep = currentTopic;
+    var found = false;
+    list.forEach(function (tp) { if (tp.id === keep) found = true; });
+    if (list.length) renderTopic(found ? keep : list[0].id);
+    if (lastResult) renderResult(lastResult, false);
+    updateCounter();
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll(".lang button"), function (b) {
+    b.addEventListener("click", function () {
+      var next = b.getAttribute("data-lang");
+      if (next === LANG) return;
+      LANG = next;
+      try { localStorage.setItem("lang", LANG); } catch (e) { /* хранилище недоступно */ }
+      applyLang();
+    });
   });
-  if (topics.length) renderTopic(topics[0].id);
+
+  applyLang();
 })();
 </script>
 </body>
