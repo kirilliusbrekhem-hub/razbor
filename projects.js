@@ -54,6 +54,8 @@
       conf: { high: "высокая", medium: "средняя", low: "низкая" },
       expNone: "Экспериментов пока нет.", expCurrent: "Текущий эксперимент", expDone: "Завершённые эксперименты",
       expStart: "Начать эксперимент", expPlanned: "Запланирован", expActive: "Идёт", expFinished: "Завершён",
+      helpBtn: "Помоги с этим шагом", helpWait: "Готовлю текст…", helpAgain: "Сделать заново", helpCopy: "Копировать", helpTitle: "Помощь ИИ",
+      helpNote: "Это черновик. Проверь его и скорректируй. Результаты эксперимента ИИ не проводит и не подставляет: их собираешь ты.",
       expDetails: "Метрики, критерии и что делать дальше",
       expDisclaimer: "48 часов это целевой срок, а не обещание результата. Эксперимент не гарантирует ни продаж, ни надёжной статистики.",
       expHyp: "Проверяемая гипотеза", expWhy: "Почему проверять сейчас", expSteps: "Действия по порядку", expBudget: "Примерный бюджет",
@@ -161,6 +163,8 @@
       conf: { high: "high", medium: "medium", low: "low" },
       expNone: "No experiments yet.", expCurrent: "Current experiment", expDone: "Completed experiments",
       expStart: "Start the experiment", expPlanned: "Planned", expActive: "In progress", expFinished: "Completed",
+      helpBtn: "Help with this step", helpWait: "Preparing the text…", helpAgain: "Redo", helpCopy: "Copy", helpTitle: "AI help",
+      helpNote: "This is a draft. Check and adjust it. The AI does not run the experiment or fill in results: you gather them.",
       expDetails: "Metrics, criteria and what to do next",
       expDisclaimer: "48 hours is a target, not a promise of results. An experiment guarantees neither sales nor reliable statistics.",
       expHyp: "Hypothesis being tested", expWhy: "Why test it now", expSteps: "Steps in order", expBudget: "Approximate budget",
@@ -257,7 +261,7 @@
     x.hypotheses = arr(x.hypotheses).filter(function (h) { return h && typeof h.id === "string"; });
     x.experiments = arr(x.experiments).filter(function (e) { return e && typeof e.id === "string"; });
     x.experiments.forEach(function (e) {
-      e.steps = arr(e.steps).map(function (s) { return { text: str(s && s.text, 300), done: !!(s && s.done) }; });
+      e.steps = arr(e.steps).map(function (s) { return { text: str(s && s.text, 300), done: !!(s && s.done), help: s && s.help && typeof s.help.draft === "string" ? { title: str(s.help.title, 100), draft: str(s.help.draft, 1500), tips: arr(s.help.tips).slice(0, 3).map(function (x) { return str(x, 250); }) } : null }; });
       e.observations = arr(e.observations);
       e.links = arr(e.links).filter(function (l) { return typeof l === "string" && /^https?:\/\//i.test(l); });
       e.tools = arr(e.tools);
@@ -528,6 +532,38 @@
     render();
   }
 
+  var helpBusy = {};
+  function helpBlock(pr, e, s) {
+    var key = e.id + ":" + s.text;
+    var box = el("div", { class: "help" });
+    if (helpBusy[key]) {
+      box.appendChild(el("p", { class: "muted", role: "status", text: p("helpWait") }));
+      return box;
+    }
+    var err = el("p", { class: "err", role: "alert" });
+    var label = s.help ? p("helpAgain") : p("helpBtn");
+    box.appendChild(btn(label, "ghost small", async function () {
+      helpBusy[key] = true; render();
+      var out = await A.api({ mode: "assist", idea: pr.idea, experiment: { title: e.title, hypothesis: e.hypothesis }, step: s.text });
+      helpBusy[key] = false;
+      if (out.ok && out.result && out.result.draft) { s.help = out.result; touch(pr); }
+      else if (out.ok && out.result && out.result.refusal) { s.helpError = out.result.refusal; }
+      else { s.helpError = out.error || ""; }
+      render();
+    }));
+    if (s.helpError) { err.textContent = s.helpError; box.appendChild(err); }
+    if (s.help) {
+      var h = s.help;
+      var det = el("details", { class: "fold", open: "" }, [el("summary", { text: p("helpTitle") + ": " + h.title })]);
+      det.appendChild(el("pre", { class: "draft", text: h.draft }));
+      det.appendChild(btn(p("helpCopy"), "ghost small", function () { A.copy(h.draft, function () {}); }));
+      if (h.tips && h.tips.length) det.appendChild(ul(h.tips));
+      det.appendChild(el("p", { class: "muted", text: p("helpNote") }));
+      box.appendChild(det);
+    }
+    return box;
+  }
+
   function experimentCard(pr, e) {
     var done = e.status === "done";
     var card = el("div", { class: "pcard exp" });
@@ -544,7 +580,9 @@
       cb.checked = !!s.done;
       if (done) cb.disabled = true;
       cb.addEventListener("change", function () { s.done = cb.checked; touch(pr); });
-      stepsOl.appendChild(el("li", null, [cb, el("label", { for: "st-" + e.id + "-" + i, text: " " + s.text })]));
+      var li = el("li", null, [cb, el("label", { for: "st-" + e.id + "-" + i, text: " " + s.text })]);
+      if (!done) li.appendChild(helpBlock(pr, e, s));
+      stepsOl.appendChild(li);
     });
     if (e.steps.length) { card.appendChild(el("h4", { text: p("expSteps") })); card.appendChild(stepsOl); }
 

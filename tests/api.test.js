@@ -65,3 +65,16 @@ test('truncated model JSON is repaired', () => {
   const r = parse(cut);
   assert.ok(r && r.risks.length === 2 && r.experiment.steps.length === 2);
 });
+
+test('assist mode returns a draft and validates the step', async () => {
+  const origFetch = global.fetch;
+  global.fetch = async () => ({ ok: true, text: async () => JSON.stringify({ choices: [{ message: { content: JSON.stringify({ title: 'Script', draft: 'Q1? Q2?', tips: ['a', 'b'] }) } }] }) });
+  try {
+    const bad = await call({ mode: 'assist', step: 'x', idea: { title: 't' } }, '8.8.8.8');
+    assert.strictEqual(bad.code, 400);
+    const ok = await call({ mode: 'assist', lang: 'ru', step: 'Найди 10 репетиторов', idea: { title: 'Напоминания' }, experiment: { title: 'e', hypothesis: 'h' } }, '8.8.4.4');
+    assert.strictEqual(ok.code, 200);
+    assert.strictEqual(ok.body.result.draft, 'Q1? Q2?');
+    assert.strictEqual(ok.body.result.tips.length, 2);
+  } finally { global.fetch = origFetch; }
+});
