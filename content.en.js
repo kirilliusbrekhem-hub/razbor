@@ -1,5 +1,35 @@
 /* English version of the ready-made reviews. Same ids and order as content.js. */
 window.SITE_EN = {
+
+  /* A full sample review shown on the first screen. cost, validate, week, to_check are optional. */
+  sample: {
+    title: "Lesson and payment reminders for private tutors",
+    verdict: "A narrow niche with a real pain, but first check if they will pay",
+    scores: { demand: 3, ease: 4, space: 3 },
+    what: "A tutor enters students and a schedule, and the service politely reminds them about the lesson and about payment in a messenger. The tutor no longer has to write \"do not forget to pay\" by hand.",
+    money: "A small monthly subscription from each tutor. The first month is free for a few tutors to get reviews and a first case study.",
+    cost: "Money needed to start is probably small. Cost items: access to an AI model and hosting (many services have a free starting tier, check their pricing) and a domain if you want your own address. An honest amount cannot be named until the services are chosen: calculate it from their pricing. This is an AI estimate, not a calculation.",
+    validate: [
+      "Talk to five tutors: how do they remind students about payment now and how much time per week does it take.",
+      "Build a page with a description and a \"I want to try\" button, show it in tutor chats and see how many people leave a contact.",
+      "For a week, manually send three tutors ready-made reminder texts and ask whether they would pay for automation."
+    ],
+    risks: "Messengers limit automatic mailings, so you must check the rules of the chosen messenger. Tutors may decide that notes on their phone are enough.",
+    week: [
+      "Day 1: write down how a tutor talks to a student before and after a lesson, and find five tutors to talk to.",
+      "Day 2: hold two conversations and note what people do now, not what they think of your idea.",
+      "Day 3: hold three more conversations and mark who named the problem themselves.",
+      "Day 4: write five reminder templates: for a lesson, for payment and after a missed lesson.",
+      "Day 5: build a page with a description and an \"I want to try\" button.",
+      "Day 6: show the page in two or three tutor chats and count the requests.",
+      "Day 7: compare the results and decide: go on, narrow the idea or drop it."
+    ],
+    to_check: [
+      "Tutors see this as a problem and are ready to pay for it.",
+      "The rules of the chosen messenger allow such reminders.",
+      "The niche has enough people for the product to pay off."
+    ]
+  },
   topics: [
     {
       id: "ai",

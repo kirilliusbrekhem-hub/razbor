@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>razbor — Idea starts here.</title>
-<meta name="description" content="Расскажи, что умеешь, и получи готовую бизнес-идею с разбором. Или отправь свою идею и узнай, где риски и что делать первым. Плюс книги, подкасты и материалы по теме.">
+<meta name="description" content="Узнай за 2 минуты, стоит ли запускать твою идею: оценка спроса и конкуренции, затраты на старт, проверка спроса до вложений, риски и план на 7 дней. Оценка ИИ, не данные рынка.">
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
@@ -248,6 +248,25 @@
   .idea-body ol { margin: 0; padding-left: 1.3rem; max-width: 64ch; }
   .idea-body li { margin: 0 0 4px; }
 
+  /* Первый экран: аудитория, пример, методика */
+  .aud { list-style: none; margin: 16px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+  .aud li { font: 500 0.88rem var(--font-body); padding: 0.3rem 0.8rem; border: 2px solid var(--ink); border-radius: 999px; background: var(--surface); }
+  .hero-cta { margin: 20px 0 0; display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
+  .hero-cta .note { color: var(--muted); font-size: 0.88rem; }
+  .sample { margin: 28px 0 0; }
+  .sample h2, .method h2 { margin: 0 0 6px; font: 700 clamp(1.3rem, 3.4vw, 1.7rem)/1.2 var(--font-display); letter-spacing: -0.01em; }
+  .sample .sub { margin: 0 0 14px; color: var(--muted); max-width: 62ch; }
+  .tag-sample { display: inline-block; margin: 0 0 8px; padding: 0.15rem 0.6rem; background: var(--marker); color: #16213E; border: 2px solid #16213E; border-radius: 6px; font: 600 0.8rem var(--font-body); }
+  .sample .cta-row { margin: 14px 0 0; }
+  .notice { margin: 0 0 14px; padding: 10px 14px; border: 2px dashed var(--muted); border-radius: 6px; font-size: 0.9rem; color: var(--muted); max-width: 70ch; }
+  .notice strong { color: var(--ink); }
+  .ai-cap { margin: 0 0 6px; font-size: 0.8rem; color: var(--muted); }
+  .check { border-left: 4px solid var(--pen); padding-left: 12px; margin-top: 12px; }
+  .method { margin: 40px 0 0; padding: 24px 0 0; border-top: 2px solid var(--ink); }
+  .method p, .method li { max-width: 68ch; }
+  .method ul { margin: 0 0 12px; padding-left: 1.3rem; }
+  .method h3 { margin: 16px 0 4px; font: 600 1rem var(--font-body); }
+
   footer { margin: 40px 0 0; padding: 20px 0 48px; border-top: 1px dashed var(--line); color: var(--muted); font-size: 0.88rem; }
   footer p { margin: 0 0 8px; max-width: 72ch; }
 
@@ -279,11 +298,23 @@
     <section class="hero" aria-labelledby="hero-title">
       <h1 id="hero-title" data-i18n="heroTitle"></h1>
       <p class="lead" data-i18n="lead"></p>
+      <ul class="aud" id="aud" aria-label="Audience"></ul>
+      <div class="hero-cta">
+        <button class="btn" id="hero-cta" type="button" data-i18n="heroCta"></button>
+        <span class="note" data-i18n="heroNote"></span>
+      </div>
     </section>
 
     <noscript><p>JavaScript is required / Для работы сайта нужен JavaScript.</p></noscript>
 
-    <section class="agent" aria-labelledby="agent-title">
+    <section class="sample" id="sample" aria-labelledby="sample-title">
+      <h2 id="sample-title" data-i18n="sampleTitle"></h2>
+      <p class="sub" data-i18n="sampleSub"></p>
+      <div id="sample-body"></div>
+      <div class="cta-row"><button class="btn" id="sample-cta" type="button" data-i18n="sampleCta"></button></div>
+    </section>
+
+    <section class="agent" id="agent" aria-labelledby="agent-title" style="margin-top:28px">
       <h2 class="sr-only" id="agent-title" data-i18n="agentTitle"></h2>
       <div class="modes" role="group" data-i18n-aria="modesAria">
         <button type="button" class="mode" data-mode="generate" aria-pressed="true"></button>
@@ -303,6 +334,11 @@
     </section>
 
     <section class="result" id="result" aria-live="polite" hidden></section>
+
+    <section class="method" id="method" aria-labelledby="method-title">
+      <h2 id="method-title" data-i18n="methTitle"></h2>
+      <div id="method-body"></div>
+    </section>
 
     <section class="library" aria-labelledby="lib-title">
       <h2 id="lib-title" data-i18n="libTitle"></h2>
@@ -334,8 +370,27 @@
   var T = {
     ru: {
       docTitle: "razbor — Idea starts here.",
-      heroTitle: "Придумай бизнес-идею и проверь, сработает ли она",
-      lead: "Расскажи, что умеешь и любишь, и агент придумает идею с разбором. Или отправь свою идею: он честно покажет, где риски и что сделать первым. Всё пишется простым языком.",
+      heroTitle: "Узнай за 2 минуты, стоит ли запускать твою идею",
+      lead: "Агент оценит спрос и конкуренцию, прикинет затраты на старт, предложит, как проверить спрос до вложений, назовёт главные риски и даст план на 7 дней. Это оценка ИИ, а не данные рынка, и в разборе это отмечено.",
+      aud: ["Начинающим предпринимателям", "Создателям онлайн-проектов", "Тем, кто запускается с маленьким бюджетом"],
+      heroCta: "Проверить мою идею",
+      heroNote: "Без регистрации. Ниже готовый пример разбора.",
+      sampleTitle: "Пример полного разбора",
+      sampleSub: "Так выглядит результат. Читай сразу, без регистрации, потом проверь свою идею.",
+      sampleTag: "Пример",
+      sampleCta: "Проверить мою идею",
+      noticeTitle: "Предположение ИИ.",
+      noticeText: " У агента нет данных рынка и источников. Спрос и затраты здесь не проверены: это то, что нужно проверить самому.",
+      aiCap: "Оценки ИИ, не данные рынка",
+      sCost: "Затраты на старт (оценка ИИ)", sValidate: "Как проверить спрос до вложений", sWeek: "План на 7 дней",
+      sCheck: "Что нужно проверить самому",
+      methTitle: "Как мы оцениваем и чего не умеем",
+      methScores: "Оценки",
+      methScoresList: ["Спрос (1-5): насколько сильна боль и сколько людей, по оценке ИИ, ищут решение.", "Старт (1-5): насколько легко начать с маленьким бюджетом и без команды.", "Место (1-5): чем выше, тем меньше заметных конкурентов, по мнению ИИ."],
+      methLimits: "Ограничения",
+      methLimitsList: ["Агент не ходит в интернет и не использует данные о рынке, поэтому источников у разбора нет. Если появятся реальные данные, мы покажем источники.", "Спрос не подтверждён. Цифры затрат и дохода приблизительные.", "ИИ может ошибаться и не знать про свежих конкурентов.", "Это не финансовая и не юридическая консультация."],
+      methVerify: "Как проверить самому",
+      methVerifyText: "Посмотри частоту запросов в Яндекс Вордстат и динамику в Google Trends, поговори минимум с пятью людьми из своей аудитории и попроси предоплату или запись в список ожидания до того, как что-то строить.",
       agentTitle: "Агент razbor",
       modesAria: "Что сделать",
       modeGenerate: "Придумай идею",
@@ -383,8 +438,27 @@
     },
     en: {
       docTitle: "razbor — Idea starts here.",
-      heroTitle: "Come up with a business idea and check if it can work",
-      lead: "Tell us what you can do and love, and the agent will come up with an idea and review it. Or send your own idea: it will honestly show the risks and what to do first. Everything is written in plain language.",
+      heroTitle: "Find out in 2 minutes whether your idea is worth launching",
+      lead: "The agent rates demand and competition, estimates start-up costs, suggests how to test demand before spending, names the main risks and gives a 7-day plan. It is an AI assessment, not market data, and every review says so.",
+      aud: ["Beginner entrepreneurs", "Creators of online projects", "People launching on a small budget"],
+      heroCta: "Check my idea",
+      heroNote: "No sign-up. A ready sample review is just below.",
+      sampleTitle: "A full sample review",
+      sampleSub: "This is what you get. Read it right away, no sign-up, then check your own idea.",
+      sampleTag: "Sample",
+      sampleCta: "Check my idea",
+      noticeTitle: "AI assumption.",
+      noticeText: " The agent has no market data or sources. Demand and costs here are not verified: they are what you need to check yourself.",
+      aiCap: "AI estimates, not market data",
+      sCost: "Start-up costs (AI estimate)", sValidate: "How to test demand before spending", sWeek: "7-day plan",
+      sCheck: "What you must verify yourself",
+      methTitle: "How we score and what we cannot do",
+      methScores: "Scores",
+      methScoresList: ["Demand (1-5): how strong the pain is and how many people, in the AI's estimate, look for a solution.", "Start (1-5): how easy it is to begin on a small budget with no team.", "Room (1-5): the higher, the fewer visible competitors, in the AI's opinion."],
+      methLimits: "Limitations",
+      methLimitsList: ["The agent does not browse the internet or use market data, so a review has no sources. If real data is ever used, we will show the sources.", "Demand is not confirmed. Cost and income figures are rough.", "AI can be wrong and may not know about new competitors.", "This is not financial or legal advice."],
+      methVerify: "How to verify it yourself",
+      methVerifyText: "Check search volume in Yandex Wordstat and the trend in Google Trends, talk to at least five people from your audience, and ask for a prepayment or a waitlist sign-up before you build anything.",
       agentTitle: "The razbor agent",
       modesAria: "What to do",
       modeGenerate: "Come up with an idea",
@@ -583,16 +657,33 @@
     return el("div", { class: "made-row" }, [link]);
   }
 
+  function noticeBlock() {
+    return el("p", { class: "notice" }, [el("strong", { text: t("noticeTitle") }), document.createTextNode(t("noticeText"))]);
+  }
+
   function section(title, content) {
     return el("div", null, [el("h3", { text: title }), content]);
   }
 
   function resultToText(res) {
-    var lines = [res.title, "", res.pitch, "", t("forWhom") + res.audience, t("pain") + res.pain, t("how") + res.how_it_works,
-      t("earn") + res.money, t("similar") + res.competitors, "", t("riskHead")];
+    var lines = [res.title, "", t("noticeTitle") + t("noticeText"), "", res.pitch, "", t("forWhom") + res.audience, t("pain") + res.pain, t("how") + res.how_it_works,
+      t("earn") + res.money];
+    if (res.cost) lines.push(t("sCost") + ": " + res.cost);
+    lines.push(t("similar") + res.competitors);
+    if (res.validate && res.validate.length) {
+      lines.push("", t("sValidate") + ":");
+      res.validate.forEach(function (v, i) { lines.push((i + 1) + ". " + v); });
+    }
+    lines.push("", t("riskHead"));
     res.risks.forEach(function (r) { lines.push("- " + r); });
-    lines.push("", t("improveHead") + res.improve, "", t("stepsHead"));
-    res.steps.forEach(function (s, i) { lines.push((i + 1) + ". " + s); });
+    lines.push("", t("improveHead") + res.improve);
+    var plan = (res.week_plan && res.week_plan.length) ? res.week_plan : res.steps;
+    lines.push("", (res.week_plan && res.week_plan.length ? t("sWeek") : t("stepsHead")) + ":");
+    plan.forEach(function (s, i) { lines.push((i + 1) + ". " + s); });
+    if (res.to_check && res.to_check.length) {
+      lines.push("", t("sCheck") + ":");
+      res.to_check.forEach(function (c) { lines.push("- " + c); });
+    }
     lines.push("", t("scoreLine") + t("demandWord") + " " + res.scores.demand + "/5, " + t("easeWord") + " " + res.scores.ease + "/5, " + t("spaceWord") + " " + res.scores.space + "/5",
       t("verdictLine") + res.verdict, "", "made with razbor." + (siteUrl() ? " " + siteUrl() + "/" : ""));
     return lines.join("\n");
@@ -627,8 +718,22 @@
 
     var risks = el("ul");
     res.risks.forEach(function (r) { risks.appendChild(el("li", { text: r })); });
+    var validateBlock = null;
+    if (res.validate && res.validate.length) {
+      var vol = el("ol");
+      res.validate.forEach(function (v) { vol.appendChild(el("li", { text: v })); });
+      validateBlock = section(t("sValidate"), vol);
+    }
+    var checkBlock = null;
+    if (res.to_check && res.to_check.length) {
+      var cul = el("ul");
+      res.to_check.forEach(function (c) { cul.appendChild(el("li", { text: c })); });
+      checkBlock = el("div", { class: "check" }, [el("h3", { text: t("sCheck") }), cul]);
+    }
+    var planItems = (res.week_plan && res.week_plan.length) ? res.week_plan : (res.steps || []);
+    var hasWeek = !!(res.week_plan && res.week_plan.length);
     var steps = el("ol");
-    res.steps.forEach(function (s) { steps.appendChild(el("li", { text: s })); });
+    planItems.forEach(function (s) { steps.appendChild(el("li", { text: s })); });
 
     var copyStatus = el("span", { class: "counter", role: "status" });
     var copyBtn = el("button", { class: "btn ghost", type: "button", text: t("copyBtn") });
@@ -648,16 +753,21 @@
       el("h2", { class: "result-title", text: res.title }),
       el("p", { class: "pitch", text: res.pitch }),
       el("p", { class: "verdict", text: res.verdict }),
+      noticeBlock(),
       scoresBlock(res.scores),
+      el("p", { class: "ai-cap", text: t("aiCap") }),
       el("div", { class: "sections" }, [
         section(t("sPeople"), el("p", { text: res.audience })),
         section(t("sPain"), el("p", { text: res.pain })),
         section(t("sHow"), el("p", { text: res.how_it_works })),
         section(t("sMoney"), el("p", { text: res.money })),
+        res.cost ? section(t("sCost"), el("p", { text: res.cost })) : null,
         section(t("sComp"), el("p", { text: res.competitors })),
+        validateBlock,
         el("div", { class: "risk" }, [el("h3", { text: t("sRisks") }), risks]),
         section(t("sImprove"), el("p", { text: res.improve })),
-        section(t("sSteps"), steps)
+        section(hasWeek ? t("sWeek") : t("sSteps"), steps),
+        checkBlock
       ]),
       actions,
       madeBadge()
@@ -769,13 +879,28 @@
       el("p", { class: "verdict", text: idea.verdict }),
       el("span", { class: "toggle" }, [el("span", { class: "t-open", text: t("openIdea") }), el("span", { class: "t-close", text: t("closeIdea") })])
     ]);
+    var planList = idea.week || idea.steps || [];
     var steps = el("ol");
-    idea.steps.forEach(function (s) { steps.appendChild(el("li", { text: s })); });
+    planList.forEach(function (s) { steps.appendChild(el("li", { text: s })); });
+    var validate = null;
+    if (idea.validate && idea.validate.length) {
+      validate = el("ol");
+      idea.validate.forEach(function (v) { validate.appendChild(el("li", { text: v })); });
+    }
+    var check = null;
+    if (idea.to_check && idea.to_check.length) {
+      check = el("ul");
+      idea.to_check.forEach(function (c) { check.appendChild(el("li", { text: c })); });
+    }
     var body = el("div", { class: "idea-body" }, [
+      idea.week ? noticeBlock() : null,
       el("div", null, [el("h4", { text: t("what") }), el("p", { text: idea.what })]),
       el("div", null, [el("h4", { text: t("money") }), el("p", { text: idea.money })]),
+      idea.cost ? el("div", null, [el("h4", { text: t("sCost") }), el("p", { text: idea.cost })]) : null,
+      validate ? el("div", null, [el("h4", { text: t("sValidate") }), validate]) : null,
       el("div", { class: "risk" }, [el("h4", { text: t("risks") }), el("p", { text: idea.risks })]),
-      el("div", null, [el("h4", { text: t("steps") }), steps]),
+      el("div", null, [el("h4", { text: idea.week ? t("sWeek") : t("steps") }), steps]),
+      check ? el("div", { class: "check" }, [el("h4", { text: t("sCheck") }), check]) : null,
       madeBadge()
     ]);
     var d = el("details", { class: "idea" }, [summary, body]);
@@ -805,10 +930,55 @@
     body.textContent = "";
     body.appendChild(el("p", { class: "topic-intro", text: topic.intro }));
     body.appendChild(el("p", { class: "legend", text: t("legend") }));
-    topic.ideas.forEach(function (idea, i) { body.appendChild(renderIdea(idea, i === 0)); });
+    topic.ideas.forEach(function (idea) { body.appendChild(renderIdea(idea, false)); });
     var mat = materialsBlock([topic.id], t("matTopic"), null);
     if (mat) body.appendChild(mat);
   }
+
+  /* ---------- Пример, методика, первый экран ---------- */
+
+  function renderSample() {
+    var src = LANG === "en" && window.SITE_EN && window.SITE_EN.sample ? window.SITE_EN.sample : (window.SITE && window.SITE.sample);
+    var body = $("sample-body");
+    body.textContent = "";
+    if (!src) { $("sample").hidden = true; return; }
+    $("sample").hidden = false;
+    body.appendChild(el("span", { class: "tag-sample", text: t("sampleTag") }));
+    var d = renderIdea(src, true);
+    d.id = "sample-idea";
+    body.appendChild(d);
+  }
+
+  function renderMethod() {
+    var body = $("method-body");
+    body.textContent = "";
+    function list(items) {
+      var ul = el("ul");
+      items.forEach(function (x) { ul.appendChild(el("li", { text: x })); });
+      return ul;
+    }
+    body.appendChild(el("h3", { text: t("methScores") }));
+    body.appendChild(list(t("methScoresList")));
+    body.appendChild(el("h3", { text: t("methLimits") }));
+    body.appendChild(list(t("methLimitsList")));
+    body.appendChild(el("h3", { text: t("methVerify") }));
+    body.appendChild(el("p", { text: t("methVerifyText") }));
+  }
+
+  function renderAud() {
+    var ul = $("aud");
+    ul.textContent = "";
+    t("aud").forEach(function (x) { ul.appendChild(el("li", { text: x })); });
+  }
+
+  function goAgent() {
+    var a = $("agent");
+    a.scrollIntoView({ behavior: "smooth", block: "start" });
+    applyMode("analyze");
+    $("agent-input").focus({ preventScroll: true });
+  }
+  $("hero-cta").addEventListener("click", goAgent);
+  $("sample-cta").addEventListener("click", goAgent);
 
   /* ---------- Язык ---------- */
 
@@ -827,6 +997,9 @@
       b.setAttribute("aria-pressed", b.getAttribute("data-lang") === LANG ? "true" : "false");
     });
     applyMode(mode);
+    renderAud();
+    renderSample();
+    renderMethod();
     renderChips();
     var list = topics();
     var keep = currentTopic;

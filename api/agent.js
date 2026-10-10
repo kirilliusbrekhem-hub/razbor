@@ -57,7 +57,10 @@ const SCHEMA = {
     competitors: { type: 'string', description: 'Какие похожие решения бывают. Названия только если уверен.' },
     improve: { type: 'string', description: 'Как сделать идею сильнее.' },
     risks: { type: 'array', items: { type: 'string' }, description: '2-4 главных риска.' },
-    steps: { type: 'array', items: { type: 'string' }, description: 'Ровно 5 первых шагов без денег.' },
+    cost: { type: 'string', description: 'Статьи затрат на старт. Сумму называть только как грубую оценку ИИ или не называть.' },
+    validate: { type: 'array', items: { type: 'string' }, description: 'Ровно 3 способа проверить спрос до вложений денег.' },
+    week_plan: { type: 'array', items: { type: 'string' }, description: 'Ровно 7 пунктов: план на 7 дней, по одному на день.' },
+    to_check: { type: 'array', items: { type: 'string' }, description: '2-4 предположения из разбора, которые нужно проверить самому.' },
     scores: {
       type: 'object',
       properties: {
@@ -70,7 +73,7 @@ const SCHEMA = {
     verdict: { type: 'string', description: 'Короткий вердикт до 60 символов.' },
     tags: { type: 'array', items: { type: 'string' }, description: '1-4 тега из разрешённого списка.' }
   },
-  required: ['title', 'pitch', 'audience', 'pain', 'how_it_works', 'money', 'competitors', 'improve', 'risks', 'steps', 'scores', 'verdict', 'tags']
+  required: ['title', 'pitch', 'audience', 'pain', 'how_it_works', 'money', 'competitors', 'cost', 'validate', 'improve', 'risks', 'week_plan', 'to_check', 'scores', 'verdict', 'tags']
 };
 
 const SYSTEM_RU = [
@@ -85,8 +88,10 @@ const SYSTEM_RU = [
   '6. Оценки в scores от 1 до 5: demand это спрос, ease это лёгкость старта без денег, space это свободное место на рынке (чем выше, тем меньше конкурентов). Это твоё мнение, а не факт.',
   '7. В tags выбери от 1 до 4 тегов только из списка: ' + ALLOWED_TAGS.join(', ') + '.',
   '8. Если запрос не про бизнес или идею нельзя разбирать безопасно, оставь поля пустыми, а в refusal коротко объясни, что можно написать.',
+  '9. У тебя нет доступа к данным рынка и источникам. Поэтому всё в scores, cost и competitors это предположения. Никогда не пиши, что спрос подтверждён. В cost перечисли статьи затрат; сумму называй только как грубую оценку и с пометкой «оценка ИИ», а если не уверен, цифр не пиши и скажи, где их посчитать.',
+  '10. validate: ровно 3 способа проверить спрос до вложений денег (например, поговорить с пятью потенциальными клиентами, сделать страницу-описание и посмотреть, сколько человек оставят контакт, посмотреть частоту поисковых запросов). week_plan: ровно 7 пунктов, по одному на день, каждый выполним за день без денег. to_check: 2-4 предположения из разбора, которые нужно проверить самому.',
   '',
-  'Требования к полям: title до 70 символов; pitch 1-2 предложения; risks 2-4 пункта; steps ровно 5 шагов, каждый начинается с глагола и выполним за 1-3 дня без денег; improve 1-2 предложения; verdict до 60 символов.',
+  'Требования к полям: title до 70 символов; pitch 1-2 предложения; risks 2-4 пункта; cost 1-3 предложения; validate ровно 3 пункта; week_plan ровно 7 пунктов, каждый начинается с глагола; to_check 2-4 пункта; improve 1-2 предложения; verdict до 60 символов.',
   'Отвечай только JSON без Markdown и без пояснений.'
 ].join('\n');
 
@@ -102,8 +107,10 @@ const SYSTEM_EN = [
   '6. scores are 1 to 5: demand is demand, ease is how easy it is to start with no money, space is free room in the market (higher means fewer competitors). This is your opinion, not a fact.',
   '7. In tags choose 1 to 4 tags only from this list: ' + ALLOWED_TAGS.join(', ') + '.',
   '8. If the request is not about business, or the idea cannot be reviewed safely, leave the fields empty and put a short explanation of what the person can write in refusal.',
+  '9. You have no access to market data or sources. So everything in scores, cost and competitors is an assumption. Never say demand is confirmed. In cost list the cost items; give an amount only as a rough estimate marked "AI estimate", and if unsure, give no numbers and say where to calculate them.',
+  '10. validate: exactly 3 ways to check demand before spending money (for example, talk to five potential customers, build a landing page and see how many leave contacts, check how often people search for it). week_plan: exactly 7 items, one per day, each doable in a day with no money. to_check: 2-4 assumptions from the review that the person must verify themselves.',
   '',
-  'Field requirements: title up to 70 characters; pitch 1-2 sentences; risks 2-4 items; steps exactly 5, each starting with a verb and doable in 1-3 days with no money; improve 1-2 sentences; verdict up to 60 characters.',
+  'Field requirements: title up to 70 characters; pitch 1-2 sentences; risks 2-4 items; cost 1-3 sentences; validate exactly 3 items; week_plan exactly 7 items, each starting with a verb; to_check 2-4 items; improve 1-2 sentences; verdict up to 60 characters.',
   'Reply with JSON only, no Markdown and no commentary.'
 ].join('\n');
 
@@ -209,14 +216,18 @@ function normalize(raw) {
     money: str(raw.money, 500),
     competitors: str(raw.competitors, 500),
     improve: str(raw.improve, 400),
+    cost: str(raw.cost, 500),
+    validate: list(raw.validate, 3, 300),
     risks: list(raw.risks, 4, 300),
     steps: list(raw.steps, 5, 300),
+    week_plan: list(raw.week_plan, 7, 300),
+    to_check: list(raw.to_check, 4, 300),
     scores: { demand: score(s.demand), ease: score(s.ease), space: score(s.space) },
     verdict: str(raw.verdict, 90),
     tags: tags.length ? tags : ['startup', 'validation']
   };
 
-  if (!result.title || !result.pitch || result.steps.length === 0) return null;
+  if (!result.title || !result.pitch || (result.steps.length === 0 && result.week_plan.length === 0)) return null;
   return result;
 }
 
@@ -227,7 +238,7 @@ async function callYandex(messages, withSchema, key, folder) {
     const body = {
       model: 'gpt://' + folder + '/' + MODEL,
       messages,
-      max_tokens: 1500,
+      max_tokens: 2400,
       temperature: 0.4,
       stream: false
     };
